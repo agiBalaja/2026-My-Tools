@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Pattern Lock 4D | Input Pola ? 8 Hasil Acak</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DV25BYV3TL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DV25BYV3TL');
+</script>
+  <!-- 1. METADATA UNTUK INSTALL DI HP -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3b82f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pattern pola acak">
+<link rel="manifest" href="manifest.json">
+
+<!-- 2. TOMBOL INSTALL (akan muncul otomatis di browser) -->
+<script>
+// Menampilkan prompt install jika browser support
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Buat tombol install kustom (opsional)
+  const installBtn = document.createElement('button');
+  installBtn.textContent = '📲 Install Aplikasi';
+  installBtn.style.position = 'fixed';
+  installBtn.style.bottom = '20px';
+  installBtn.style.right = '20px';
+  installBtn.style.zIndex = '9999';
+  installBtn.style.padding = '12px 20px';
+  installBtn.style.backgroundColor = '#3b82f6';
+  installBtn.style.color = 'white';
+  installBtn.style.border = 'none';
+  installBtn.style.borderRadius = '40px';
+  installBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+  installBtn.style.fontWeight = 'bold';
+  installBtn.style.cursor = 'pointer';
+  
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response: ${outcome}`);
+      deferredPrompt = null;
+      installBtn.remove();
+    }
+  });
+  
+  document.body.appendChild(installBtn);
+});
+</script>
+<style>
+  * {
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #eef2f5;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1e466e;
+  }
+
+  /* Panel Informasi */
+  .info-panel {
+    background: linear-gradient(135deg, #1e2a3a, #0f1724);
+    border-radius: 32px;
+    padding: 20px 24px;
+    margin-bottom: 30px;
+    color: white;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+
+  .info-panel h3 {
+    margin: 0 0 8px 0;
+  }
+
+  .info-text {
+    font-size: 0.9rem;
+    background: #00000055;
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 50px;
+  }
+
+  .container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    justify-items: center;
+    margin-top: 10px;
+  }
+
+  .pattern {
+    background: white;
+    border-radius: 32px;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    padding: 16px 12px 20px 12px;
+    transition: transform 0.2s;
+    width: 300px;
+  }
+
+  .pattern:hover {
+    transform: translateY(-4px);
+  }
+
+  .pattern-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #2c3e66;
+    margin-bottom: 6px;
+  }
+
+  .pattern-4d {
+    text-align: center;
+    font-size: 1.5rem;
+    font-family: monospace;
+    font-weight: bold;
+    background: #e0e7ff;
+    display: inline-block;
+    width: 100%;
+    padding: 4px 0;
+    border-radius: 30px;
+    margin-bottom: 10px;
+    color: #1e466e;
+  }
+
+  .wrapper {
+    position: relative;
+    width: 280px;
+    height: 320px;
+    margin: 0 auto;
+    touch-action: none;
+    cursor: crosshair;
+  }
+
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .angka-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: repeat(4, 80px);
+    gap: 12px;
+    justify-content: center;
+    align-content: start;
+    z-index: 2;
+  }
+
+  .angka {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #f0f3f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #1f3a5f;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: all 0.1s ease;
+    cursor: grab;
+    touch-action: none;
+    border: 2px solid transparent;
+  }
+
+  .angka:active {
+    cursor: grabbing;
+  }
+
+  .angka.active {
+    background: #2196f3;
+    color: white;
+    box-shadow: 0 0 0 3px rgba(33,150,243,0.4);
+    transform: scale(0.96);
+  }
+
+  /* Read-only pattern tidak memiliki cursor pointer dan tidak bisa drag */
+  .pattern.readonly .angka {
+    cursor: default;
+    background: #eef2f5;
+    pointer-events: none;
+  }
+
+  .pattern.readonly .angka.active {
+    background: #2196f3;
+    pointer-events: none;
+  }
+
+  .pattern.readonly .wrapper {
+    cursor: default;
+  }
+
+  .nol {
+    grid-column: 2 / 3;
+    grid-row: 4 / 5;
+  }
+
+  .angka[data-angka="1"] { grid-row: 1; grid-column: 1; }
+  .angka[data-angka="2"] { grid-row: 1; grid-column: 2; }
+  .angka[data-angka="3"] { grid-row: 1; grid-column: 3; }
+  .angka[data-angka="4"] { grid-row: 2; grid-column: 1; }
+  .angka[data-angka="5"] { grid-row: 2; grid-column: 2; }
+  .angka[data-angka="6"] { grid-row: 2; grid-column: 3; }
+  .angka[data-angka="7"] { grid-row: 3; grid-column: 1; }
+  .angka[data-angka="8"] { grid-row: 3; grid-column: 2; }
+  .angka[data-angka="9"] { grid-row: 3; grid-column: 3; }
+  .angka.nol { grid-row: 4; grid-column: 2; margin-top: 4px; }
+
+  @media (max-width: 700px) {
+    .angka {
+      width: 70px;
+      height: 70px;
+      font-size: 24px;
+    }
+    .wrapper {
+      width: 260px;
+      height: 300px;
+    }
+    .angka-container {
+      gap: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h2> Pattern Lock 4D | Input Pola ? 8 Hasil Acak</h2>
+
+<div class="info-panel">
+  <h3>Cara Penggunaan</h3>
+  <div class="info-text">
+    1. Gambar pola (drag/geser) pada <strong>Pattern Input</strong> (pertama).<br>
+    2. Pola yang digambar akan menjadi <strong>seed</strong> untuk menghasilkan 8 angka 4D acak.<br>
+    3. Hasil acak (8 pattern di bawah) otomatis diperbarui dan <strong>read-only</strong> (tidak bisa digambar ulang).<br>
+    4. Setiap kali menggambar pola baru di input, hasil acak akan berubah.
+  </div>
+</div>
+
+<div class="container" id="container"></div>
+
+<script>
+  // --------------------------------------------------------------
+  // 1. BUAT PATTERN: 1 input pattern + 8 result pattern (readonly)
+  // --------------------------------------------------------------
+  const container = document.getElementById("container");
+  const TOTAL_RESULTS = 31;
+
+  // Input pattern (indeks 0)
+  container.insertAdjacentHTML("beforeend", `
+    <div class="pattern" data-pattern-idx="input">
+      <div class="pattern-title"> PATTERN INPUT</div>
+      <div class="wrapper">
+        <svg width="280" height="320" viewBox="0 0 280 320"></svg>
+        <div class="angka-container">
+          ${[1,2,3,4,5,6,7,8,9].map(n => `<div class="angka" data-angka="${n}">${n}</div>`).join("")}
+          <div class="angka nol" data-angka="0">0</div>
+        </div>
+      </div>
+    </div>
+  `);
+
+  // Result patterns (readonly)
+  for (let i = 1; i <= TOTAL_RESULTS; i++) {
+    container.insertAdjacentHTML("beforeend", `
+      <div class="pattern readonly" data-pattern-idx="result-${i}">
+        <div class="pattern-title"> Hasil ${i}</div>
+        <div class="pattern-4d" id="fourdLabel-${i}">----</div>
+        <div class="wrapper">
+          <svg width="280" height="320" viewBox="0 0 280 320"></svg>
+          <div class="angka-container">
+            ${[1,2,3,4,5,6,7,8,9].map(n => `<div class="angka" data-angka="${n}">${n}</div>`).join("")}
+            <div class="angka nol" data-angka="0">0</div>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  // --------------------------------------------------------------
+  // 2. RANDOM SYSTEM (berbasis seed angka integer)
+  // --------------------------------------------------------------
+  // LCG generator
+  function lcg(seed) {
+    let state = seed >>> 0;
+    return function() {
+      state = (state * 1664525 + 1013904223) >>> 0;
+      return state;
+    };
+  }
+
+  // Menghasilkan angka 4D (0000-9999) berdasarkan seed dan index
+  function generateFourD(seedNumber, patternIndex) {
+    const combinedSeed = (seedNumber ^ (patternIndex * 0x9e3779b9)) >>> 0;
+    const rng = lcg(combinedSeed);
+    let val = rng();
+    val = (val + rng()) >>> 0;
+    const raw = val % 10000;
+    return raw.toString().padStart(4, '0');
+  }
+
+  // Ubah angka 4D menjadi pola urutan digit unik (hapus duplikat, pertahankan urutan)
+  function uniquePatternFromFourD(fourD) {
+    const digits = fourD.split('');
+    const seen = new Set();
+    const unique = [];
+    for (let d of digits) {
+      if (!seen.has(d)) {
+        seen.add(d);
+        unique.push(d);
+      }
+    }
+    return unique;
+  }
+
+  // --------------------------------------------------------------
+  // 3. SETUP INPUT PATTERN (interaktif, drag untuk memilih angka)
+  // --------------------------------------------------------------
+  let inputPatternController = null;
+
+  function setupInputPattern(patternElement) {
+    const wrapper = patternElement.querySelector(".wrapper");
+    const svg = patternElement.querySelector("svg");
+    const angkaElements = [...patternElement.querySelectorAll(".angka")];
+    
+    let points = [];
+    let isDragging = false;
+    let currentTempPoint = null;
+    let globalMouseMove = null, globalMouseUp = null;
+    let globalTouchMove = null, globalTouchEnd = null;
+
+    function resetPatternState() {
+      points = [];
+      currentTempPoint = null;
+      angkaElements.forEach(el => el.classList.remove("active"));
+      svg.innerHTML = "";
+      isDragging = false;
+    }
+
+    function addNumber(numberEl) {
+      if (!numberEl) return false;
+      const value = numberEl.dataset.angka;
+      if (points.some(p => p.value === value)) return false;
+      const center = getCenterRelative(numberEl, wrapper);
+      points.push({ value, x: center.x, y: center.y });
+      numberEl.classList.add("active");
+      return true;
+    }
+
+    function redraw() {
+      svg.innerHTML = "";
+      if (!points.length) return;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p1 = points[i], p2 = points[i+1];
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", p1.x);
+        line.setAttribute("y1", p1.y);
+        line.setAttribute("x2", p2.x);
+        line.setAttribute("y2", p2.y);
+        line.setAttribute("stroke", "#2196f3");
+        line.setAttribute("stroke-width", "4");
+        line.setAttribute("stroke-linecap", "round");
+        svg.appendChild(line);
+      }
+      if (currentTempPoint && points.length > 0) {
+        const last = points[points.length - 1];
+        const tempLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        tempLine.setAttribute("x1", last.x);
+        tempLine.setAttribute("y1", last.y);
+        tempLine.setAttribute("x2", currentTempPoint.x);
+        tempLine.setAttribute("y2", currentTempPoint.y);
+        tempLine.setAttribute("stroke", "#64b5f6");
+        tempLine.setAttribute("stroke-width", "4");
+        tempLine.setAttribute("stroke-linecap", "round");
+        tempLine.setAttribute("stroke-dasharray", "6 4");
+        svg.appendChild(tempLine);
+      }
+    }
+
+    function getCenterRelative(element, wrapperEl) {
+      const elemRect = element.getBoundingClientRect();
+      const wrapRect = wrapperEl.getBoundingClientRect();
+      return {
+        x: elemRect.left + elemRect.width/2 - wrapRect.left,
+        y: elemRect.top + elemRect.height/2 - wrapRect.top
+      };
+    }
+
+    function getNumberAtPoint(clientX, clientY) {
+      for (let el of angkaElements) {
+        const rect = el.getBoundingClientRect();
+        if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+          return el;
+        }
+      }
+      return null;
+    }
+
+    function handleDragMove(clientX, clientY) {
+      if (!isDragging) return;
+      const wrapRect = wrapper.getBoundingClientRect();
+      currentTempPoint = { x: clientX - wrapRect.left, y: clientY - wrapRect.top };
+      const hit = getNumberAtPoint(clientX, clientY);
+      if (hit && !hit.classList.contains("active")) {
+        addNumber(hit);
+        const newWrapRect = wrapper.getBoundingClientRect();
+        currentTempPoint = { x: clientX - newWrapRect.left, y: clientY - newWrapRect.top };
+      }
+      redraw();
+    }
+
+    function endDrag() {
+      if (!isDragging) return;
+      currentTempPoint = null;
+      redraw();
+      isDragging = false;
+      if (globalMouseMove) window.removeEventListener("mousemove", globalMouseMove);
+      if (globalMouseUp) window.removeEventListener("mouseup", globalMouseUp);
+      if (globalTouchMove) window.removeEventListener("touchmove", globalTouchMove);
+      if (globalTouchEnd) window.removeEventListener("touchend", globalTouchEnd);
+      
+      // --- Setelah selesai drag, generate hasil acak berdasarkan pola ---
+      if (points.length > 0) {
+        const patternDigits = points.map(p => p.value);
+        // Konversi pola menjadi seed angka (gabungkan digit)
+        const seedNumber = parseInt(patternDigits.join(''), 10);
+        // Jika pola menghasilkan seed NaN (misal kosong), pakai default
+        const finalSeed = isNaN(seedNumber) ? 0 : seedNumber;
+        generateAllResults(finalSeed);
+      } else {
+        // Jika pola kosong, hasil tetap kosong
+        clearAllResults();
+      }
+    }
+
+    function startDragFromNumber(startEl, clientX, clientY) {
+      if (isDragging) endDrag();
+      resetPatternState();
+      const center = getCenterRelative(startEl, wrapper);
+      points = [{ value: startEl.dataset.angka, x: center.x, y: center.y }];
+      startEl.classList.add("active");
+      isDragging = true;
+      currentTempPoint = { x: center.x, y: center.y };
+      redraw();
+
+      globalMouseMove = (e) => { e.preventDefault(); handleDragMove(e.clientX, e.clientY); };
+      globalMouseUp = (e) => { e.preventDefault(); endDrag(); };
+      globalTouchMove = (e) => { e.preventDefault(); const t = e.touches[0]; if (t) handleDragMove(t.clientX, t.clientY); };
+      globalTouchEnd = (e) => { e.preventDefault(); endDrag(); };
+      window.addEventListener("mousemove", globalMouseMove);
+      window.addEventListener("mouseup", globalMouseUp);
+      window.addEventListener("touchmove", globalTouchMove, { passive: false });
+      window.addEventListener("touchend", globalTouchEnd);
+    }
+
+    // Pasang event listener ke setiap angka
+    angkaElements.forEach(angka => {
+      angka.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startDragFromNumber(angka, e.clientX, e.clientY);
+      });
+      angka.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const touch = e.touches[0];
+        if (touch) startDragFromNumber(angka, touch.clientX, touch.clientY);
+      });
+    });
+
+    wrapper.addEventListener("dragstart", e => e.preventDefault());
+    wrapper.addEventListener("selectstart", e => e.preventDefault());
+
+    return { reset: resetPatternState };
+  }
+
+  // --------------------------------------------------------------
+  // 4. SETUP RESULT PATTERNS (readonly, hanya bisa diisi secara programatis)
+  // --------------------------------------------------------------
+  const resultControllers = [];
+
+  function setupResultPattern(patternElement, index) {
+    const wrapper = patternElement.querySelector(".wrapper");
+    const svg = patternElement.querySelector("svg");
+    const angkaElements = [...patternElement.querySelectorAll(".angka")];
+    const labelDiv = patternElement.querySelector(".pattern-4d");
+
+    // Fungsi untuk menggambar pola dari array digit
+    function setPatternFromDigitArray(digitArray) {
+      // Bersihkan semua active
+      angkaElements.forEach(el => el.classList.remove("active"));
+      svg.innerHTML = "";
+      if (!digitArray || digitArray.length === 0) return;
+
+      // Kumpulkan titik-titik
+      const points = [];
+      for (let digit of digitArray) {
+        const el = angkaElements.find(ae => ae.dataset.angka === digit);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        const wrapRect = wrapper.getBoundingClientRect();
+        const x = rect.left + rect.width/2 - wrapRect.left;
+        const y = rect.top + rect.height/2 - wrapRect.top;
+        points.push({ x, y });
+        el.classList.add("active");
+      }
+      // Gambar garis
+      for (let i = 0; i < points.length - 1; i++) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", points[i].x);
+        line.setAttribute("y1", points[i].y);
+        line.setAttribute("x2", points[i+1].x);
+        line.setAttribute("y2", points[i+1].y);
+        line.setAttribute("stroke", "#2196f3");
+        line.setAttribute("stroke-width", "4");
+        line.setAttribute("stroke-linecap", "round");
+        svg.appendChild(line);
+      }
+    }
+
+    function setFourDLabel(fourD) {
+      if (labelDiv) labelDiv.innerText = fourD;
+    }
+
+    resultControllers.push({ setPattern: setPatternFromDigitArray, setFourDLabel });
+  }
+
+  // --------------------------------------------------------------
+  // 5. GENERATE SEMUA HASIL BERDASARKAN SEED ANGKA
+  // --------------------------------------------------------------
+  function generateAllResults(seedNumber) {
+    const fourDNumbers = [];
+    for (let i = 0; i < TOTAL_RESULTS; i++) {
+      fourDNumbers.push(generateFourD(seedNumber, i));
+    }
+    for (let i = 0; i < resultControllers.length; i++) {
+      const fourD = fourDNumbers[i];
+      const pattern = uniquePatternFromFourD(fourD);
+      resultControllers[i].setPattern(pattern);
+      resultControllers[i].setFourDLabel(fourD);
+    }
+    console.log(`Seed: ${seedNumber} ? Generated:`, fourDNumbers);
+  }
+
+  function clearAllResults() {
+    for (let i = 0; i < resultControllers.length; i++) {
+      resultControllers[i].setPattern([]);
+      resultControllers[i].setFourDLabel("----");
+    }
+  }
+
+  // --------------------------------------------------------------
+  // 6. INISIALISASI SEMUA PATTERN
+  // --------------------------------------------------------------
+  // Input pattern (pertama)
+  const inputPatternDiv = document.querySelector('.pattern[data-pattern-idx="input"]');
+  if (inputPatternDiv) {
+    setupInputPattern(inputPatternDiv);
+  }
+
+  // Result patterns
+  const resultPatterns = document.querySelectorAll('.pattern[data-pattern-idx^="result-"]');
+  resultPatterns.forEach((pattern, idx) => {
+    setupResultPattern(pattern, idx);
+  });
+
+  // Generate awal dengan seed default (pola kosong -> hasil kosong)
+  clearAllResults();
+
+  // Pencegahan scroll saat drag
+  document.querySelectorAll(".angka-container").forEach(cont => {
+    cont.addEventListener("touchstart", (e) => {
+      if (e.target.closest(".angka")) e.preventDefault();
+    }, { passive: false });
+  });
+
+  console.log("? Siap! Gambar pola di Pattern Input untuk menghasilkan 8 angka 4D acak.");
+</script>
+
+</body>
+</html>

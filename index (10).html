@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Generator Angka Acak LCG + Prediksi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- 1. METADATA UNTUK INSTALL DI HP -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3b82f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tools Lapangan">
+<link rel="manifest" href="manifest.json">
+
+<!-- 2. TOMBOL INSTALL (akan muncul otomatis di browser) -->
+<script>
+// Menampilkan prompt install jika browser support
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Buat tombol install kustom (opsional)
+  const installBtn = document.createElement('button');
+  installBtn.textContent = '📲 Install Aplikasi';
+  installBtn.style.position = 'fixed';
+  installBtn.style.bottom = '20px';
+  installBtn.style.right = '20px';
+  installBtn.style.zIndex = '9999';
+  installBtn.style.padding = '12px 20px';
+  installBtn.style.backgroundColor = '#3b82f6';
+  installBtn.style.color = 'white';
+  installBtn.style.border = 'none';
+  installBtn.style.borderRadius = '40px';
+  installBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+  installBtn.style.fontWeight = 'bold';
+  installBtn.style.cursor = 'pointer';
+  
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response: ${outcome}`);
+      deferredPrompt = null;
+      installBtn.remove();
+    }
+  });
+  
+  document.body.appendChild(installBtn);
+});
+</script>
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-slow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .glow {
+            box-shadow: 0 0 15px rgba(72, 187, 120, 0.6);
+        }
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fade-out {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.3s ease-out forwards;
+        }
+        .animate-fade-out {
+            animation: fade-out 0.3s ease-out forwards;
+        }
+        
+        /* Responsive styles untuk prediksi */
+        .prediksi-container {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .prediksi-container .angka-badge {
+            display: inline-block;
+            margin: 4px 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        @media (max-width: 640px) {
+            .prediksi-container .angka-badge {
+                font-size: 11px;
+                padding: 3px 6px;
+                margin: 3px;
+            }
+            .prediksi-section {
+                margin-bottom: 12px;
+            }
+        }
+        /* Scroll horizontal untuk angka jika terlalu panjang */
+        .angka-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .angka-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        .angka-scroll::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        .angka-scroll::-webkit-scrollbar-thumb {
+            background: #6b7280;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-['Poppins'] bg-gradient-to-br from-cyan-200 to-blue-300 min-h-screen flex items-center justify-center p-3 sm:p-4">
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-xl">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 p-4 sm:p-6 text-center">
+            <h1 class="text-xl sm:text-3xl font-bold text-white">Generator LCG Angka Acak</h1>
+            <p class="text-white/90 mt-1 sm:mt-2 text-xs sm:text-sm">Hasilkan angka acak dengan Linear Congruential Generator</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="p-4 sm:p-6 md:p-8">
+            <!-- Input Section - Responsive Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div class="space-y-1">
+                    <label for="min" class="block text-xs sm:text-sm font-medium text-gray-700">Batas Bawah</label>
+                    <input type="number" id="min" placeholder="0001" value="0001" 
+                           class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-sm">
+                </div>
+                <div class="space-y-1">
+                    <label for="max" class="block text-xs sm:text-sm font-medium text-gray-700">Batas Atas</label>
+                    <input type="number" id="max" placeholder="9999" value="9999" 
+                           class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-sm">
+                </div>
+                <div class="space-y-1">
+                    <label for="match" class="block text-xs sm:text-sm font-medium text-gray-700">Angka Target</label>
+                    <input type="number" id="match" placeholder="Masukkan angka" 
+                           class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-sm">
+                </div>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6">
+                <button id="generateBtn" onclick="generateNumbers(false)"
+                        class="flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md transition-all hover:shadow-lg active:scale-95 text-sm sm:text-base">
+                    <i class="fas fa-dice"></i> Acak Angka
+                </button>
+                <button id="autoGenerateBtn" onclick="startAutoGenerate()"
+                        class="flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all hover:shadow-lg active:scale-95 text-sm sm:text-base">
+                    <i class="fas fa-sync-alt"></i> Generate Otomatis
+                </button>
+            </div>
+            
+            <!-- Result Display -->
+            <div class="mb-4 sm:mb-6">
+                <div class="text-xs sm:text-sm font-medium text-gray-700 mb-2">Hasil:</div>
+                <div id="result" class="bg-gray-50 p-3 sm:p-4 rounded-lg border-2 border-gray-200 min-h-16 flex flex-wrap gap-1 sm:gap-2 items-center justify-center">
+                    <span class="text-gray-400">-</span>
+                </div>
+            </div>
+            
+            <!-- Frekuensi Digit -->
+            <div class="mb-4 sm:mb-6">
+                <div class="text-xs sm:text-sm font-medium text-gray-700 mb-2">Frekuensi Digit:</div>
+                <div id="frequency" class="bg-gray-50 p-3 sm:p-4 rounded-lg border-2 border-gray-200 text-xs sm:text-sm">
+                    -
+                </div>
+            </div>
+
+            <!-- Kombinasi Panas & Dingin -->
+            <div class="mb-4 sm:mb-6">
+                <div class="text-xs sm:text-sm font-medium text-gray-700 mb-2">Kombinasi Panas & Dingin:</div>
+                <div id="kombinasi" class="bg-gray-50 p-3 sm:p-4 rounded-lg border-2 border-gray-200 text-xs sm:text-sm">
+                    -
+                </div>
+            </div>
+
+            <!-- Prediksi - Responsive dengan scroll -->
+            <div class="mb-4 sm:mb-6">
+                <div class="text-xs sm:text-sm font-medium text-gray-700 mb-2">Prediksi (BBFS & Turunan):</div>
+                <div id="prediksi" class="bg-gray-50 p-3 sm:p-4 rounded-lg border-2 border-gray-200 text-xs sm:text-sm prediksi-container">
+                    -
+                </div>
+            </div>
+            
+            <!-- Message -->
+            <div id="message" class="text-center text-base sm:text-lg font-semibold text-emerald-600 opacity-0 h-6 sm:h-8 transition-opacity duration-500"></div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 text-center text-xs text-gray-500">
+            <p>Linear Congruential Generator (LCG) - Algoritma pembangkit bilangan acak</p>
+        </div>
+    </div>
+
+    <script>
+        // Implementasi Linear Congruential Generator (LCG)
+        class LinearCongruentialGenerator {
+            constructor(seed) {
+                this.modulus = 2 ** 31;
+                this.multiplier = 1103515245;
+                this.increment = 12345;
+                this.state = (seed || Date.now()) >>> 0;
+            }
+
+            next() {
+                this.state = (this.multiplier * this.state + this.increment) % this.modulus;
+                return this.state;
+            }
+
+            random() {
+                return this.next() / this.modulus;
+            }
+
+            randomInt(min, max) {
+                return Math.floor(this.random() * (max - min + 1)) + min;
+            }
+        }
+
+        let lcg = new LinearCongruentialGenerator();
+        let autoGenerateInterval = null;
+
+        // ======================= FUNGSI ANALISIS =======================
+        function hitungFrekuensi(angkaArray) {
+            const freq = {};
+            for (let i = 0; i <= 9; i++) freq[i] = 0;
+            angkaArray.forEach(num => {
+                num.split('').forEach(digit => { freq[digit]++; });
+            });
+            return freq;
+        }
+
+        function tampilkanFrekuensi(freq) {
+            const freqDiv = document.getElementById('frequency');
+            freqDiv.innerHTML = Object.entries(freq)
+                .map(([digit, count]) => `<span class="inline-block mr-2 sm:mr-3 mb-1">${digit}: <b>${count}</b></span>`)
+                .join(' ');
+        }
+
+        function cariPanasDingin(freq) {
+            const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+            const panas = sorted.slice(0, 5).map(x => x[0]);
+            const dingin = sorted.slice(-5).map(x => x[0]);
+            return { panas, dingin };
+        }
+
+        function buatKombinasi(panas, dingin, jumlah = 5) {
+            const hasil = [];
+            for (let i = 0; i < jumlah; i++) {
+                let angka = '';
+                angka += panas[Math.floor(Math.random() * panas.length)];
+                angka += panas[Math.floor(Math.random() * panas.length)];
+                angka += dingin[Math.floor(Math.random() * dingin.length)];
+                angka += dingin[Math.floor(Math.random() * dingin.length)];
+                hasil.push(angka);
+            }
+            return hasil;
+        }
+
+        function tampilkanKombinasi(kombinasi) {
+            const div = document.getElementById('kombinasi');
+            div.innerHTML = kombinasi
+                .map(k => `<span class="inline-block bg-emerald-100 text-emerald-700 px-2 py-1 rounded mr-1 sm:mr-2 mb-1 text-xs sm:text-sm">${k}</span>`)
+                .join(' ');
+        }
+
+        function generateBBFS(panas, dingin) {
+            const bbfs = [
+                ...panas.slice(0, 3),
+                ...dingin.slice(0, 2)
+            ];
+            return bbfs.filter(d => d !== undefined);
+        }
+
+        function generate4D(bbfs, limit = 10) {
+            if (bbfs.length === 0) return ['0000'];
+            const hasil = new Set();
+            while (hasil.size < limit) {
+                let angka = '';
+                for (let i = 0; i < 4; i++) {
+                    angka += bbfs[Math.floor(Math.random() * bbfs.length)];
+                }
+                hasil.add(angka);
+            }
+            return Array.from(hasil);
+        }
+
+        function turunanAngka(angkaList) {
+            const hasil3D = new Set();
+            const hasil2D = new Set();
+            angkaList.forEach(num => {
+                if (num.length >= 3) hasil3D.add(num.slice(1));
+                if (num.length >= 2) hasil2D.add(num.slice(2));
+            });
+            return { d3: Array.from(hasil3D), d2: Array.from(hasil2D) };
+        }
+
+        // Fungsi tampilkan prediksi dengan responsive scroll
+        function tampilkanPrediksi(bbfs, hasil4D, turunan) {
+            const div = document.getElementById('prediksi');
+            
+            // Buat HTML dengan scroll horizontal untuk angka yang banyak
+            const html = `
+                <div class="prediksi-section mb-3">
+                    <div class="font-semibold text-gray-800 mb-1 text-xs sm:text-sm">🔢 BBFS:</div>
+                    <div class="angka-scroll">
+                        ${bbfs.map(x => `<span class="angka-badge inline-block bg-purple-100 text-purple-700 px-2 py-1 rounded mr-1 text-xs sm:text-sm font-mono">${x}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="prediksi-section mb-3">
+                    <div class="font-semibold text-gray-800 mb-1 text-xs sm:text-sm">🎯 4D (10 Angka):</div>
+                    <div class="angka-scroll">
+                        ${hasil4D.map(x => `<span class="angka-badge inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded mr-1 text-xs sm:text-sm font-mono font-bold">${x}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="prediksi-section mb-3">
+                    <div class="font-semibold text-gray-800 mb-1 text-xs sm:text-sm">📊 3D (Belakang):</div>
+                    <div class="angka-scroll">
+                        ${turunan.d3.map(x => `<span class="angka-badge inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded mr-1 text-xs sm:text-sm font-mono">${x}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="prediksi-section">
+                    <div class="font-semibold text-gray-800 mb-1 text-xs sm:text-sm">⚡ 2D (Ekor):</div>
+                    <div class="angka-scroll">
+                        ${turunan.d2.map(x => `<span class="angka-badge inline-block bg-pink-100 text-pink-700 px-2 py-1 rounded mr-1 text-xs sm:text-sm font-mono">${x}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            
+            div.innerHTML = html;
+        }
+
+        // ======================= GENERATOR UTAMA =======================
+        function generateNumbers(isAuto) {
+            const min = parseInt(document.getElementById('min').value);
+            const max = parseInt(document.getElementById('max').value);
+            const match = parseInt(document.getElementById('match').value);
+            const generateBtn = document.getElementById('generateBtn');
+            const autoGenerateBtn = document.getElementById('autoGenerateBtn');
+            const messageDiv = document.getElementById('message');
+            const resultDiv = document.getElementById('result');
+
+            if (isNaN(min) || isNaN(max)) {
+                showAlert("Masukkan batas bawah dan atas yang valid!");
+                if (isAuto) stopAutoGenerate();
+                return;
+            }
+            if (min >= max) {
+                showAlert("Batas bawah harus lebih kecil dari batas atas!");
+                if (isAuto) stopAutoGenerate();
+                return;
+            }
+            if (max - min + 1 < 11) {
+                showAlert("Rentang terlalu kecil untuk menghasilkan 11 angka unik!");
+                if (isAuto) stopAutoGenerate();
+                return;
+            }
+
+            lcg = new LinearCongruentialGenerator(Date.now());
+
+            const numbers = new Set();
+            while (numbers.size < 11) {
+                const randomNumber = lcg.randomInt(min, max);
+                numbers.add(randomNumber);
+            }
+
+            const digitLength = max < 1000 ? 3 : 4;
+            const formattedNumbers = Array.from(numbers).map(num => num.toString().padStart(digitLength, '0'));
+            const formattedMatch = !isNaN(match) ? match.toString().padStart(digitLength, '0') : null;
+            const hasMatch = formattedMatch && formattedNumbers.includes(formattedMatch);
+
+            resultDiv.innerHTML = formattedNumbers.map(num => {
+                if (formattedMatch && num === formattedMatch) {
+                    return `<span class="bg-red-100 text-red-600 font-bold px-2 py-1 rounded-md animate-pulse-slow text-sm">${num}</span>`;
+                }
+                return `<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-md text-sm">${num}</span>`;
+            }).join(' ');
+
+            const freq = hitungFrekuensi(formattedNumbers);
+            tampilkanFrekuensi(freq);
+
+            const { panas, dingin } = cariPanasDingin(freq);
+            const kombinasiBaru = buatKombinasi(panas, dingin, 6);
+            tampilkanKombinasi(kombinasiBaru);
+
+            const bbfs = generateBBFS(panas, dingin);
+            const hasil4D = generate4D(bbfs, 10);
+            const turunan = turunanAngka(hasil4D);
+            tampilkanPrediksi(bbfs, hasil4D, turunan);
+
+            if (hasMatch) {
+                messageDiv.textContent = "🎉 Selamat! Angka target ditemukan!";
+                messageDiv.classList.remove('opacity-0');
+                messageDiv.classList.add('opacity-100', 'text-emerald-600');
+                
+                generateBtn.disabled = true;
+                autoGenerateBtn.disabled = true;
+                stopAutoGenerate();
+
+                const matchedElement = document.querySelector('.animate-pulse-slow');
+                if (matchedElement) matchedElement.classList.add('glow');
+
+                setTimeout(() => {
+                    generateBtn.disabled = false;
+                    autoGenerateBtn.disabled = false;
+                    messageDiv.classList.remove('opacity-100');
+                    messageDiv.classList.add('opacity-0');
+                    if (matchedElement) matchedElement.classList.remove('glow');
+                    setTimeout(() => { messageDiv.textContent = ""; }, 500);
+                }, 3000);
+            } else {
+                messageDiv.textContent = "";
+                messageDiv.classList.remove('opacity-100');
+                messageDiv.classList.add('opacity-0');
+            }
+        }
+
+        function showAlert(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'fixed top-4 right-4 left-4 sm:left-auto bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-lg z-50 animate-fade-in text-sm';
+            alertDiv.innerHTML = `<div class="flex items-center"><i class="fas fa-exclamation-circle mr-2"></i><span>${message}</span></div>`;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => {
+                alertDiv.classList.add('animate-fade-out');
+                setTimeout(() => alertDiv.remove(), 500);
+            }, 3000);
+        }
+
+        function startAutoGenerate() {
+            const match = parseInt(document.getElementById('match').value);
+            if (isNaN(match)) {
+                showAlert("Masukkan angka target untuk generate otomatis!");
+                return;
+            }
+
+            const autoGenerateBtn = document.getElementById('autoGenerateBtn');
+            autoGenerateBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Generate Otomatis';
+            autoGenerateBtn.onclick = stopAutoGenerate;
+            autoGenerateBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            autoGenerateBtn.classList.add('bg-amber-600', 'hover:bg-amber-700');
+
+            autoGenerateInterval = setInterval(() => {
+                generateNumbers(true);
+            }, 100);
+        }
+
+        function stopAutoGenerate() {
+            if (autoGenerateInterval) {
+                clearInterval(autoGenerateInterval);
+                autoGenerateInterval = null;
+            }
+            const autoGenerateBtn = document.getElementById('autoGenerateBtn');
+            autoGenerateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Generate Otomatis';
+            autoGenerateBtn.onclick = startAutoGenerate;
+            autoGenerateBtn.classList.remove('bg-amber-600', 'hover:bg-amber-700');
+            autoGenerateBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        }
+    </script>
+</body>
+</html>
