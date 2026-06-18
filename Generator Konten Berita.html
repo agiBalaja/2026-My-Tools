@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Konten Berita</title>
+    <!-- Meload html2canvas untuk konversi HTML ke Gambar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            text-align: center;
+        }
+
+        /* Gaya untuk Form Input (Panel Kontrol) */
+        .control-panel {
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 25px;
+            box-sizing: border-box;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-color);
+            font-size: 14px;
+        }
+
+        .form-group input[type="text"], 
+        .form-group textarea,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #dcdde1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input[type="text"]:focus, 
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-group input[type="file"] {
+            padding: 6px;
+            background-color: var(--light-bg);
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            color: #fff;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-save { 
+            background-color: var(--secondary-color); 
+        }
+        .btn-save:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-share { 
+            background-color: var(--primary-color); 
+        }
+        .btn-share:hover {
+            background-color: #2980b9;
+        }
+
+        /* --- Kontainer Pratinjau (Responsif) --- */
+        .preview-wrapper {
+            width: 100%;
+            max-width: auto;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        /* Gaya Template Postingan (Tetap berukuran 500px untuk hasil export yang tajam) */
+        .post-container {
+            width: 500px;
+            min-width: 500px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background-color: #111; /* Latar belakang gelap jika belum ada gambar */
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Label Viral */
+        .viral-tag {
+            position: absolute;
+            top: 45px;
+            right: 25px;
+            background-color: var(--danger-color);
+            color: white;
+            padding: 6px 18px;
+            font-weight: 900;
+            font-style: italic;
+            font-size: 22px;
+            border-radius: 6px;
+            transform: rotate(-5deg);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            z-index: 10;
+        }
+
+        /* Gradasi Overlay Teks Terbawah */
+        .text-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px 24px 24px 24px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 40%, rgba(0,0,0,0.6) 75%, transparent);
+            color: #fff;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .main-title {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.25;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .main-title .white-title {
+            color: #ffffff;
+        }
+
+        .main-title .yellow-title {
+            color: #f1c40f;
+        }
+
+        .description-text {
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: #f5f6fa;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            font-weight: 400;
+        }
+
+        /* Bagian Footer di dalam kartu post (Sumber Info) */
+        .post-footer {
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            border-top: 1px solid #f1f2f6;
+        }
+
+        .source-text {
+            color: var(--danger-color);
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        .likes-count {
+            color: #7f8c8d;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Notifikasi Custom */
+        .custom-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .custom-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Info Responsive Mobile */
+        .responsive-info {
+            font-size: 11px;
+            color: #7f8c8d;
+            text-align: center;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Generator Konten Berita</h1>
+
+    <!-- PANEL KONTROL -->
+    <div class="control-panel">
+        <div class="form-group">
+            <label for="imageInput">1. Upload Gambar Latar</label>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label for="titleInput1">2. Judul Baris 1 (Putih)</label>
+            <input type="text" id="titleInput1" value="Sinergi dan Koordinasi">
+        </div>
+        <div class="form-group">
+            <label for="titleInput2">3. Judul Baris 2 (Kuning)</label>
+            <input type="text" id="titleInput2" value="Jajaran Sekolah Lakukan Pertemuan Strategis demi Tingkatkan Kualitas Pendidikan">
+        </div>
+        <div class="form-group">
+            <label for="descInput">4. Deskripsi Berita</label>
+            <textarea id="descInput" rows="3">Dalam rangka memperkuat tata kelola dan mutu pelayanan pendidikan, jajaran staf dan tenaga pendidik SMK Negeri di Jambi menggelar pertemuan koordinasi internal.</textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-save" onclick="saveAsImage()">
+                <span>💾</span> Simpan Gambar
+            </button>
+            <button class="btn-share" onclick="shareContent()">
+                <span>🔗</span> Bagikan Berita
+            </button>
+        </div>
+    </div>
+
+    <!-- AREA PRATINJAU KARTU BERITA -->
+    <div class="preview-wrapper">
+        <div class="post-container" id="postCard">
+            <div class="image-container">
+                <!-- Gambar Default Placeholder jika pengguna belum mengupload foto -->
+                <img id="previewImg" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=500&q=80" alt="Preview Background">
+                <div class="viral-tag">SEKILAS INFO!</div>
+                
+                <div class="text-overlay">
+                    <div class="main-title">
+                        <span id="textTitle1" class="white-title">Sinergi dan Koordinasi</span><br>
+                        <span id="textTitle2" class="yellow-title">Jajaran Sekolah Lakukan Pertemuan Strategis</span>
+                    </div>
+                    <div class="description-text" id="textDesc">
+                        Dalam rangka memperkuat tata kelola dan mutu pelayanan pendidikan, jajaran staf dan tenaga pendidik SMK Negeri di Jambi menggelar pertemuan koordinasi internal.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer dengan sumber yang dinamis -->
+
+        </div>
+    </div>
+    
+    <div class="responsive-info">Geser pratinjau jika terpotong pada layar ponsel kecil</div>
+
+    <!-- NOTIFIKASI CUSTOM (PENGGANTI ALERT) -->
+    <div id="toast" class="custom-toast">
+        <span id="toastIcon">✨</span>
+        <span id="toastMessage">Pesan berhasil ditampilkan!</span>
+    </div>
+
+    <script>
+        // Elemen Input Form
+        const imageInput = document.getElementById('imageInput');
+        const titleInput1 = document.getElementById('titleInput1');
+        const titleInput2 = document.getElementById('titleInput2');
+        const descInput = document.getElementById('descInput');
+        const sourceInput = document.getElementById('sourceInput');
+
+        // Elemen Pratinjau Desain Kartu
+        const previewImg = document.getElementById('previewImg');
+        const textTitle1 = document.getElementById('textTitle1');
+        const textTitle2 = document.getElementById('textTitle2');
+        const textDesc = document.getElementById('textDesc');
+        const textSource = document.getElementById('textSource');
+
+        // Toast Notification System
+        function showToast(message, icon = "✨") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            document.getElementById('toastIcon').innerText = icon;
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Live Preview: Update Gambar ketika pengguna mengunggah file baru
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    showToast("Gambar latar berhasil diunggah!", "📸");
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Live Preview: Update Teks Secara Realtime saat pengguna mengetik
+        titleInput1.addEventListener('input', () => { 
+            textTitle1.innerText = titleInput1.value || "JUDUL BARIS 1"; 
+        });
+
+        titleInput2.addEventListener('input', () => { 
+            // Mengubah baris baru / newline menjadi elemen <br> agar rapi di pratinjau
+            const cleanText = titleInput2.value.replace(/\n/g, '<br>');
+            textTitle2.innerHTML = cleanText || "JUDUL BARIS 2"; 
+        });
+
+        descInput.addEventListener('input', () => { 
+            textDesc.innerText = descInput.value || "Deskripsi rincian berita utama Anda di sini..."; 
+        });
+
+        sourceInput.addEventListener('input', () => { 
+            const sourceVal = sourceInput.value.trim().toUpperCase();
+            textSource.innerText = sourceVal ? "SUMBER: " + sourceVal : "SUMBER: UMUM"; 
+        });
+
+        // FUNGSI 1: Simpan Konten sebagai File Gambar PNG
+        function saveAsImage() {
+            const card = document.getElementById('postCard');
+            showToast("Sedang memproses gambar...", "⏳");
+            
+            // Menggunakan html2canvas untuk merender elemen div menjadi objek canvas gambar
+            html2canvas(card, { 
+                useCORS: true,
+                allowTaint: true,
+                scale: 2 // Meningkatkan skala rendering agar hasil download tidak pecah / buram
+            }).then(canvas => {
+                try {
+                    const link = document.createElement('a');
+                    link.download = 'postingan-berita-viral.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    showToast("Gambar sukses diunduh!", "✅");
+                } catch (err) {
+                    console.error("Gagal mendownload gambar:", err);
+                    showToast("Gagal menyimpan gambar secara otomatis.", "❌");
+                }
+            }).catch(error => {
+                console.error("html2canvas error:", error);
+                showToast("Terjadi kesalahan sistem ekspor.", "❌");
+            });
+        }
+
+        // FUNGSI 2: Berbagi Konten (Mendukung Web Share API ponsel cerdas atau Salin Teks ke Clipboard)
+        function shareContent() {
+            const fullTitle = `${titleInput1.value} - ${titleInput2.value}`;
+            const shareText = `📰 *${fullTitle}*\n\n${descInput.value}\n\nSumber: ${sourceInput.value}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: fullTitle,
+                    text: descInput.value,
+                    url: window.location.href
+                }).then(() => {
+                    showToast("Berhasil dibagikan!", "🎉");
+                }).catch((error) => {
+                    console.log('Batal atau gagal membagikan:', error);
+                });
+            } else {
+                // Clipboard Fallback jika Web Share API tidak didukung pada browser desktop
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = shareText;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast("Teks berita berhasil disalin ke clipboard!", "📋");
+                } catch (err) {
+                    showToast("Gagal menyalin teks berita otomatis.", "❌");
+                }
+                document.body.removeChild(tempTextArea);
+            }
+        }
+    </script>
+</body>
+</html>

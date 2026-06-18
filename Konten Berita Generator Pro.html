@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembuat Gambar Berita Pro</title>
+    
+    <!-- PERBAIKAN 1: Memanggil library html2canvas resmi dari CDN cdnjs (Cloudflare) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .form-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 400px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Panel Tombol */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+        }
+
+        .btn-simpan { background-color: #2e7d32; }
+        .btn-share { background-color: #1565c0; }
+        .btn:hover { opacity: 0.9; }
+
+        /* Wadah Utama Gambar Berita */
+        .container-berita {
+            position: relative;
+            width: 400px;
+            height: 450px;
+            background-color: #ddd;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .container-berita img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65%;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+        }
+
+        .konten-teks {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            color: white;
+        }
+
+        .judul-berita {
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .bg-oranye { 
+            background-color: #ff9800; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            display: inline-block; 
+            margin-bottom: 4px; 
+        }
+        .putih { 
+            color: #ffffff; 
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+        .bg-biru { 
+            background-color: #1e3a8a; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            display: inline-block; 
+        }
+
+        .sumber-foto {
+            font-size: 11px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Konten Berita Generator Pro</h2>
+    
+    <div class="form-panel">
+        <div class="form-group">
+            <label>1. Pilih Gambar</label>
+            <input type="file" id="upload-gambar" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>2. Teks Baris Atas (Blok Oranye)</label>
+            <input type="text" id="input-baris1" value="Eks Kepala Gudang Cimory">
+        </div>
+        <div class="form-group">
+            <label>3. Teks Baris Tengah (Putih)</label>
+            <input type="text" id="input-baris2" value="Dibui gegara Edarkan Kembali Produk">
+        </div>
+        <div class="form-group">
+            <label>4. Teks Baris Bawah (Blok Biru)</label>
+            <input type="text" id="input-baris3" value="Kedaluwarsa">
+        </div>
+        <div class="form-group">
+            <label>5. Sumber Foto</label>
+            <input type="text" id="input-foto" value="Foto: Istimewa">
+        </div>
+
+        <!-- Tombol Aksi (PERBAIKAN 2: Memperbaiki Emoji teks tombol yang rusak) -->
+        <div class="btn-group">
+            <button class="btn btn-simpan" id="btn-simpan">💾 Simpan Gambar</button>
+            <button class="btn btn-share" id="btn-share">📢 Bagikan</button>
+        </div>
+    </div>
+
+    <!-- Preview Visual (PERBAIKAN 3: Menyelaraskan teks awal preview dengan nilai input) -->
+    <div class="container-berita" id="area-berita">
+        <img id="preview-img" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=400&q=80" alt="Berita" crossorigin="anonymous">
+        <div class="overlay"></div>
+        <div class="konten-teks">
+            <div class="judul-berita">
+                <span class="bg-oranye" id="text-baris1">Eks Kepala Gudang Cimory</span><br>
+                <span class="putih" id="text-baris2">Dibui gegara Edarkan Kembali Produk</span><br>
+                <span class="bg-biru" id="text-baris3">Kedaluwarsa</span>
+            </div>
+            <div class="sumber-foto" id="text-foto">Foto: Istimewa</div>
+        </div>
+    </div>
+
+    <script>
+        const uploadGambar = document.getElementById('upload-gambar');
+        const inputBaris1 = document.getElementById('input-baris1');
+        const inputBaris2 = document.getElementById('input-baris2');
+        const inputBaris3 = document.getElementById('input-baris3');
+        const inputFoto = document.getElementById('input-foto');
+
+        const previewImg = document.getElementById('preview-img');
+        const textBaris1 = document.getElementById('text-baris1');
+        const textBaris2 = document.getElementById('text-baris2');
+        const textBaris3 = document.getElementById('text-baris3');
+        const textFoto = document.getElementById('text-foto');
+
+        const btnSimpan = document.getElementById('btn-simpan');
+        const btnShare = document.getElementById('btn-share');
+        const areaBerita = document.getElementById('area-berita');
+
+        // Render Gambar Saat Diupload
+        uploadGambar.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.setAttribute('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Event Perubahan Teks Real-time
+        inputBaris1.addEventListener('input', function() {
+            textBaris1.textContent = this.value;
+            textBaris1.style.display = this.value.trim() === "" ? "none" : "inline-block";
+        });
+        inputBaris2.addEventListener('input', function() {
+            textBaris2.textContent = this.value;
+            textBaris2.style.display = this.value.trim() === "" ? "none" : "inline-block";
+        });
+        inputBaris3.addEventListener('input', function() {
+            textBaris3.textContent = this.value;
+            textBaris3.style.display = this.value.trim() === "" ? "none" : "inline-block";
+        });
+        inputFoto.addEventListener('input', function() {
+            textFoto.textContent = this.value;
+        });
+
+        // --- FITUR 1: SIMPAN GAMBAR (DOWNLOAD PNG) ---
+        btnSimpan.addEventListener('click', function() {
+            html2canvas(areaBerita, { useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'berita-media-sosial.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error("Gagal membuat gambar:", err);
+                alert("Terjadi kesalahan saat memproses gambar.");
+            });
+        });
+
+        // --- FITUR 2: SHARE KE MEDIA SOSIAL / SYSTEM SHARE ---
+        btnShare.addEventListener('click', function() {
+            html2canvas(areaBerita, { useCORS: true }).then(canvas => {
+                canvas.toBlob(blob => {
+                    const file = new File([blob], "berita.png", { type: "image/png" });
+                    
+                    // Mengecek apakah browser mendukung Web Share API untuk File
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'Berita Hari Ini',
+                            text: textBaris1.textContent + " " + textBaris2.textContent
+                        })
+                        .then(() => console.log('Berhasil membagikan!'))
+                        .catch((error) => console.log('Gagal membagikan:', error));
+                    } else {
+                        alert("Browser Anda tidak mendukung fitur share langsung. Silakan gunakan tombol 'Simpan Gambar' terlebih dahulu, lalu unggah manual ke media sosial.");
+                    }
+                }, 'image/png');
+            });
+        });
+    </script>
+
+</body>
+</html>
