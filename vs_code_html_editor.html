@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VS Code HTML Editor</title>
+    <style>
+        /* Mengatur ulang margin dan layout dasar */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+        }
+
+        /* Gaya untuk Toolbar */
+        .toolbar {
+            height: 50px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 0 15px;
+            background: #252526;
+            border-bottom: 1px solid #444;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #0e639c;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background: #1177bb;
+        }
+
+        /* Gaya khusus untuk tombol Save saat berhasil menyimpan */
+        button.success {
+            background: #28a745;
+        }
+
+        button.success:hover {
+            background: #218838;
+        }
+
+        /* Layout Container Utama */
+        #container {
+            display: flex;
+            height: calc(100% - 50px);
+            width: 100%;
+        }
+
+        /* Area Editor & Preview */
+        #editor {
+            width: 50%;
+            height: 100%;
+        }
+
+        #divider {
+            width: 6px;
+            background: #333;
+            cursor: col-resize;
+            z-index: 10;
+            transition: background-color 0.2s;
+        }
+
+        #divider:hover, #divider.dragging {
+            background: #007acc;
+        }
+
+        #preview {
+            flex-grow: 1; /* Mengisi sisa ruang */
+            width: calc(50% - 6px);
+            border: none;
+            background: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Bagian Toolbar -->
+    <div class="toolbar">
+        <button id="saveBtn" onclick="saveCode()">Save</button>
+        <button onclick="downloadHTML()">Download</button>
+        <button onclick="uploadFile()">Upload</button>
+        <button onclick="toggleFullscreen()">Fullscreen</button>
+        <input type="file" id="fileInput" accept=".html" hidden>
+    </div>
+
+    <!-- Bagian Konten Editor & Preview -->
+    <div id="container">
+        <div id="editor"></div>
+        <div id="divider"></div>
+        <iframe id="preview"></iframe>
+    </div>
+
+    <!-- Memuat Monaco Editor melalui CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    <script>
+        let editor;
+
+        // Konfigurasi path untuk Monaco Editor
+        require.config({
+            paths: {
+                'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs'
+            }
+        });
+
+        // Inisialisasi Editor
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: localStorage.getItem('htmlCode') || `<!DOCTYPE html>\n<html lang="id">\n<head>\n  <style>\n    body {\n      font-family: sans-serif;\n      text-align: center;\n      margin-top: 50px;\n    }\n  </style>\n</head>\n<body>\n  <h1>Halo Dunia!</h1>\n  <p>Mulai ketik kode HTML Anda di sini.</p>\n</body>\n</html>`,
+                language: 'html',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: 15,
+                minimap: {
+                    enabled: true
+                }
+            });
+
+            updatePreview();
+
+            // Auto-update preview saat kode diubah (tapi tidak auto-save ke LocalStorage agar tombol Save lebih berguna)
+            editor.onDidChangeModelContent(() => {
+                updatePreview();
+            });
+        });
+
+        // Fungsi Memperbarui Preview
+        function updatePreview() {
+            if (editor) {
+                document.getElementById('preview').srcdoc = editor.getValue();
+            }
+        }
+
+        // --- FITUR BARU: FUNGSI SAVE ---
+        function saveCode() {
+            if (!editor) return;
+            
+            // Simpan ke Local Storage browser
+            localStorage.setItem('htmlCode', editor.getValue());
+            
+            // Ubah tampilan tombol untuk memberikan feedback kepada pengguna
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = 'Tersimpan!';
+            btn.classList.add('success');
+            
+            // Kembalikan tombol seperti semula setelah 2 detik
+            setTimeout(() => {
+                btn.innerText = 'Save';
+                btn.classList.remove('success');
+            }, 2000);
+        }
+
+        // Fungsi Mengunduh File
+        function downloadHTML() {
+            if (!editor) return;
+            const blob = new Blob([editor.getValue()], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'index.html';
+            a.click();
+        }
+
+        // Fungsi Mengunggah File
+        function uploadFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (editor) {
+                    editor.setValue(reader.result);
+                    // Langsung simpan setelah unggah selesai
+                    saveCode();
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Fungsi Layar Penuh
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // --- Logika Drag untuk Mengubah Ukuran Panel (Resizer) ---
+        const divider = document.getElementById('divider');
+        let dragging = false;
+
+        divider.addEventListener('mousedown', () => {
+            dragging = true;
+            divider.classList.add('dragging');
+            // Matikan interaksi pointer di iframe agar mousemove tidak terganggu saat di atas preview
+            document.getElementById('preview').style.pointerEvents = 'none'; 
+        });
+
+        document.addEventListener('mouseup', () => {
+            dragging = false;
+            divider.classList.remove('dragging');
+            document.getElementById('preview').style.pointerEvents = 'auto';
+        });
+
+        document.addEventListener('mousemove', e => {
+            if (!dragging) return;
+            let percent = (e.clientX / window.innerWidth) * 100;
+            
+            // Batasi minimal ukuran panel (10% hingga 90%)
+            if (percent < 10) percent = 10;
+            if (percent > 90) percent = 90;
+
+            document.getElementById('editor').style.width = percent + '%';
+            document.getElementById('preview').style.width = `calc(${100 - percent}% - 6px)`;
+        });
+
+    </script>
+</body>
+</html>

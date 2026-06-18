@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Poster Frame 9:16 | Klik untuk Upload</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #003366;
+            --accent-blue: #00509E;
+            --soft-bg: #f0f2f5;
+            --card-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--soft-bg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* Panel kontrol mobile first */
+        .controls {
+            background: white;
+            padding: 20px 18px;
+            border-radius: 28px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .controls h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 18px;
+            border-left: 5px solid var(--accent-blue);
+            padding-left: 14px;
+        }
+
+        /* Layout Form Input Menjadi Grid */
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-grid-2 .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .form-group input[type="file"],
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            transition: 0.2s;
+            background-color: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,80,158,0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 0;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            background-color: var(--primary-blue);
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        button.download-btn { background-color: #0f4c2c; }
+
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
+        /* Preview Container */
+        .preview-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        #poster {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 9 / 16;
+            background-color: var(--primary-blue);
+            position: relative;
+            overflow: hidden;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+
+        #bg-img-display {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,51,102,0.25) 0%, rgba(0,51,102,0.55) 35%, rgba(0,35,70,0.9) 70%, rgba(0,20,40,1) 100%);
+            z-index: 2;
+        }
+
+        .poster-content {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 3;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            color: white;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: clamp(0.65rem, 3.5vw, 0.85rem);
+            line-height: 1.3;
+            letter-spacing: 0.3px;
+        }
+
+        .hashtag-top {
+            font-weight: 800;
+            font-size: clamp(0.7rem, 4vw, 1rem);
+            text-align: right;
+        }
+
+        .hashtag-top span { color: #ff6b6b; }
+
+        .frame-container {
+            flex: 1;
+            position: relative;
+            margin: 5px 0 15px 0;
+            min-height: 0;
+        }
+
+        .polaroid {
+            position: absolute;
+            background: white;
+            padding: 2px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .polaroid img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            aspect-ratio: 16 / 9;
+            border-radius: 4px;
+        }
+
+        /* Overlay hint untuk upload saat frame di-hover */
+        .polaroid::after {
+            content: "📷 Ubah Foto";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none; /* Agar klik tetap menembus ke frame */
+            white-space: nowrap;
+        }
+
+        .polaroid:hover::after {
+            opacity: 1;
+        }
+
+        .bottom-section {
+            margin-top: auto;
+            color: white;
+            z-index: 5;
+            position: relative;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .tag-title {
+            background-color: var(--accent-blue);
+            display: inline-block;
+            padding: 6px 16px;
+            font-size: clamp(0.9rem, 4vw, 1.3rem);
+            font-weight: 800;
+            border-radius: 40px;
+            margin-bottom: 10px;
+            letter-spacing: -0.2px;
+        }
+
+        .main-description {
+            font-size: clamp(0.65rem, 3vw, 0.85rem);
+            line-height: 1.4;
+            margin-bottom: 12px;
+            text-align: left;
+            font-weight: 500;
+            opacity: 0.95;
+            max-width: 90%;
+        }
+
+        .date-text {
+            font-size: clamp(1rem, 5vw, 1.5rem);
+            font-weight: 800;
+            border-left: 3px solid #ffb347;
+            padding-left: 10px;
+            line-height: 1.2;
+        }
+
+        .footer-website {
+            position: absolute;
+            bottom: 16px;
+            right: 20px;
+            font-weight: 700;
+            font-size: clamp(0.6rem, 2.8vw, 0.8rem);
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 0.5px;
+            z-index: 10;
+        }
+
+        @media (max-width: 480px) {
+            .poster-content { padding: 12px 16px; }
+            .main-description { max-width: 100%; }
+            .controls { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <h2>🎨 Editor Poster 9:16</h2>
+    
+    <div class="form-grid-2">
+        <div class="form-group">
+            <label>📷 Background Utama</label>
+            <input type="file" id="bg-upload" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>📅 Tanggal Acara</label>
+            <input type="date" id="input-date">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>📐 Pilih Layout Bingkai (12 Gaya)</label>
+        <select id="layoutSelect">
+            </select>
+    </div>
+
+    <div class="form-group">
+        <label>🏷️ Judul Tag (kotak biru)</label>
+        <input type="text" id="input-tag" value="#SelaluAdaKabarBaik">
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+        <label>📝 Deskripsi Utama</label>
+        <textarea id="input-desc" rows="3">Menteri Sosial Saifullah Yusuf menghadiri langsung Open House Sekolah Rakyat di Aceh Besar. Sementara di Jakarta, Wakil Menteri Sosial Agus Jabo Priyono menerima audiensi dari Bupati Aceh Utara.</textarea>
+    </div>
+
+    <div class="btn-group">
+        <button class="download-btn" id="downloadPosterBtn">⬇️ Unduh Poster HD</button>
+    </div>
+    
+    <p style="font-size: 11px; margin-top: 12px; text-align: center; color: #475569; font-weight: 600;">
+        ✨ INFO: Klik langsung pada bingkai foto di dalam poster untuk mengunggah gambar.
+    </p>
+
+    <input type="file" id="frame1-upload" accept="image/*" style="display: none;">
+    <input type="file" id="frame2-upload" accept="image/*" style="display: none;">
+    <input type="file" id="frame3-upload" accept="image/*" style="display: none;">
+</div>
+
+<div class="preview-container">
+    <div id="poster">
+        <img id="bg-img-display" src="https://placehold.co/900x1600/1e3a5f/white?text=Background+Kemensos" alt="Background">
+        <div class="overlay"></div>
+
+        <div class="poster-content">
+            <div class="header">
+                <div class="logo">KEMENTERIAN SOSIAL<br>REPUBLIK INDONESIA</div>
+                <div class="hashtag-top">#KEMENSOS<br><span>SELALU</span>ADA</div>
+            </div>
+
+            <div class="frame-container" id="frameContainer">
+                <div class="polaroid" id="polaroidFrame1">
+                    <img id="frame1-display" src="https://placehold.co/400x300/e2e8f0/2c3e50?text=Klik+Ubah+1" alt="Frame 1">
+                </div>
+                <div class="polaroid" id="polaroidFrame2">
+                    <img id="frame2-display" src="https://placehold.co/400x300/cbd5e1/2c3e50?text=Klik+Ubah+2" alt="Frame 2">
+                </div>
+                <div class="polaroid" id="polaroidFrame3">
+                    <img id="frame3-display" src="https://placehold.co/400x300/f1f5f9/2c3e50?text=Klik+Ubah+3" alt="Frame 3">
+                </div>
+            </div>
+
+            <div class="bottom-section">
+                <div class="tag-title" id="display-tag">#SelaluAdaKabarBaik</div>
+                <div class="main-description" id="display-desc">
+                    Menteri Sosial Saifullah Yusuf menghadiri langsung Open House Sekolah Rakyat di Aceh Besar. Sementara di Jakarta, Wakil Menteri Sosial Agus Jabo Priyono menerima audiensi dari Bupati Aceh Utara.
+                </div>
+                <div class="date-text" id="display-date">
+                    </div>
+            </div>
+            <div class="footer-website">kemensos.go.id</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------------------- 12 DATABASE LAYOUT POSTER ----------------------
+    const LAYOUTS = [
+        { name: "Klasik Dwi Frame (3 Foto)", frames: {
+            frame1: { display: "block", left: "52%", top: "6%", transform: "rotate(5deg)", width: "199px", zIndex: 3 },
+            frame2: { display: "block", left: "8%", top: "38%", transform: "rotate(-6deg)", width: "170px", zIndex: 2 },
+            frame3: { display: "block", left: "40%", top: "60%", transform: "rotate(3deg)", width: "170px" }
+        }},
+        { name: "Triple Dinamis (Diagonal)", frames: {
+            frame1: { display: "block", left: "6%", top: "10%", transform: "rotate(-9deg)", width: "200px", zIndex: 2 },
+            frame2: { display: "block", left: "48%", top: "38%", transform: "rotate(11deg)", width: "160px", zIndex: 3 },
+            frame3: { display: "block", left: "22%", top: "62%", transform: "rotate(-3deg)", width: "180px", zIndex: 1 }
+        }},
+        { name: "Majalah Modern (2 Besar + 1 Kecil)", frames: {
+            frame1: { display: "block", left: "48%", top: "8%", transform: "rotate(2deg)", width: "200px", zIndex: 3 },
+            frame2: { display: "block", left: "3%", top: "48%", transform: "rotate(-8deg)", width: "160px", zIndex: 2 },
+            frame3: { display: "block", left: "42%", top: "66%", transform: "rotate(7deg)", width: "200px", zIndex: 1 }
+        }},
+        { name: "Lapis Kreatif (Tumpuk Estetik)", frames: {
+            frame1: { display: "block", left: "12%", top: "18%", transform: "rotate(-4deg)", width: "150px", zIndex: 1 },
+            frame2: { display: "block", left: "40%", top: "28%", transform: "rotate(9deg)", width: "155px", zIndex: 3 },
+            frame3: { display: "block", left: "58%", top: "55%", transform: "rotate(-1deg)", width: "135px", zIndex: 2 }
+        }},
+        { name: "Minimalis Cerita (Fokus Sudut)", frames: {
+            frame1: { display: "block", left: "60%", top: "6%", transform: "rotate(8deg)", width: "145px", zIndex: 3 },
+            frame2: { display: "block", left: "6%", top: "58%", transform: "rotate(-10deg)", width: "155px", zIndex: 2 },
+            frame3: { display: "block", left: "38%", top: "22%", transform: "rotate(0deg)", width: "115px", zIndex: 1 }
+        }},
+        { name: "Dinamis Miring (Ekstrim)", frames: {
+            frame1: { display: "block", left: "14%", top: "8%", transform: "rotate(-13deg)", width: "140px", zIndex: 2 },
+            frame2: { display: "block", left: "55%", top: "32%", transform: "rotate(14deg)", width: "150px", zIndex: 3 },
+            frame3: { display: "block", left: "28%", top: "68%", transform: "rotate(-5deg)", width: "130px", zIndex: 1 }
+        }},
+        { name: "Kolase Mosaik (Menyebar)", frames: {
+            frame1: { display: "block", left: "50%", top: "5%", transform: "rotate(4deg)", width: "165px", zIndex: 2 },
+            frame2: { display: "block", left: "5%", top: "42%", transform: "rotate(-11deg)", width: "155px", zIndex: 3 },
+            frame3: { display: "block", left: "70%", top: "65%", transform: "rotate(6deg)", width: "120px", zIndex: 1 }
+        }},
+        { name: "Zigzag Rapi (Tertata)", frames: {
+            frame1: { display: "block", left: "10%", top: "5%", transform: "rotate(2deg)", width: "140px", zIndex: 1 },
+            frame2: { display: "block", left: "55%", top: "35%", transform: "rotate(-4deg)", width: "140px", zIndex: 2 },
+            frame3: { display: "block", left: "15%", top: "65%", transform: "rotate(3deg)", width: "140px", zIndex: 3 }
+        }},
+        { name: "Fokus Tengah (Tumpuk Pusat)", frames: {
+            frame1: { display: "block", left: "20%", top: "15%", transform: "rotate(-12deg)", width: "130px", zIndex: 1 },
+            frame2: { display: "block", left: "45%", top: "10%", transform: "rotate(15deg)", width: "130px", zIndex: 2 },
+            frame3: { display: "block", left: "28%", top: "38%", transform: "rotate(0deg)", width: "170px", zIndex: 3 }
+        }},
+        { name: "Gravitasi Balik (Dominan Bawah)", frames: {
+            frame1: { display: "block", left: "50%", top: "60%", transform: "rotate(8deg)", width: "160px", zIndex: 3 },
+            frame2: { display: "block", left: "8%", top: "30%", transform: "rotate(-6deg)", width: "140px", zIndex: 2 },
+            frame3: { display: "block", left: "45%", top: "5%", transform: "rotate(4deg)", width: "120px", zIndex: 1 }
+        }},
+        { name: "Satu Besar Atas (Hero Banner)", frames: {
+            frame1: { display: "block", left: "25%", top: "2%", transform: "rotate(0deg)", width: "180px", zIndex: 1 },
+            frame2: { display: "block", left: "5%", top: "50%", transform: "rotate(-10deg)", width: "120px", zIndex: 2 },
+            frame3: { display: "block", left: "55%", top: "55%", transform: "rotate(8deg)", width: "120px", zIndex: 3 }
+        }},
+        { name: "Sejajar Santai (Flow Alami)", frames: {
+            frame1: { display: "block", left: "15%", top: "8%", transform: "rotate(-5deg)", width: "135px", zIndex: 3 },
+            frame2: { display: "block", left: "45%", top: "35%", transform: "rotate(4deg)", width: "135px", zIndex: 2 },
+            frame3: { display: "block", left: "25%", top: "65%", transform: "rotate(-3deg)", width: "135px", zIndex: 1 }
+        }}
+    ];
+
+    const frame1Elem = document.getElementById('polaroidFrame1');
+    const frame2Elem = document.getElementById('polaroidFrame2');
+    const frame3Elem = document.getElementById('polaroidFrame3');
+    const frameImg1 = document.getElementById('frame1-display');
+    const frameImg2 = document.getElementById('frame2-display');
+    const frameImg3 = document.getElementById('frame3-display');
+
+    const inputTag = document.getElementById('input-tag');
+    const displayTag = document.getElementById('display-tag');
+    const inputDesc = document.getElementById('input-desc');
+    const displayDesc = document.getElementById('display-desc');
+    const inputDate = document.getElementById('input-date');
+    const displayDate = document.getElementById('display-date');
+    const layoutSelect = document.getElementById('layoutSelect');
+
+    const bgUpload = document.getElementById('bg-upload');
+    const bgImg = document.getElementById('bg-img-display');
+    const frame1Upload = document.getElementById('frame1-upload');
+    const frame2Upload = document.getElementById('frame2-upload');
+    const frame3Upload = document.getElementById('frame3-upload');
+
+    // Menerapkan gaya layout berdasarkan indeks pilihan
+    function applyLayout(layoutIndex) {
+        const layout = LAYOUTS[layoutIndex % LAYOUTS.length];
+        const styleMap = layout.frames;
+        
+        [ { el: frame1Elem, st: styleMap.frame1 }, 
+          { el: frame2Elem, st: styleMap.frame2 }, 
+          { el: frame3Elem, st: styleMap.frame3 } ].forEach(f => {
+            if (f.st.display === 'block') {
+                f.el.style.display = 'block';
+                f.el.style.left = f.st.left;
+                f.el.style.top = f.st.top;
+                f.el.style.transform = f.st.transform;
+                f.el.style.width = f.st.width;
+                f.el.style.zIndex = f.st.zIndex;
+            } else {
+                f.el.style.display = 'none';
+            }
+        });
+    }
+
+    // Generate Opsi Dropdown
+    function initDropdown() {
+        LAYOUTS.forEach((layout, index) => {
+            const opt = document.createElement('option');
+            opt.value = index;
+            opt.textContent = `${index + 1}. ${layout.name}`;
+            layoutSelect.appendChild(opt);
+        });
+    }
+    initDropdown();
+    applyLayout(0);
+
+    layoutSelect.addEventListener('change', (e) => {
+        applyLayout(parseInt(e.target.value));
+    });
+    
+    // Auto Date Bahasa Indonesia
+    function formatIndonesianDate(dateString) {
+        if (!dateString) return "Tanggal<br>Tahun";
+        const d = new Date(dateString);
+        if (isNaN(d)) return "Tanggal<br>Tahun";
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        return `${d.getDate()} ${months[d.getMonth()]}<br>${d.getFullYear()}`;
+    }
+
+    const today = new Date();
+    inputDate.value = today.toISOString().split('T')[0];
+    displayDate.innerHTML = formatIndonesianDate(inputDate.value);
+
+    inputDate.addEventListener('change', () => { 
+        displayDate.innerHTML = formatIndonesianDate(inputDate.value); 
+    });
+    
+    // Live text update
+    inputTag.addEventListener('input', () => { displayTag.innerText = inputTag.value; });
+    inputDesc.addEventListener('input', () => { displayDesc.innerText = inputDesc.value; });
+    
+    // Setup Logika Upload (Membaca file menjadi gambar)
+    function setupImageUpload(inputElement, targetImgElement) {
+        if (!inputElement) return;
+        inputElement.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { targetImgElement.src = e.target.result; };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    setupImageUpload(bgUpload, bgImg);
+    setupImageUpload(frame1Upload, frameImg1);
+    setupImageUpload(frame2Upload, frameImg2);
+    setupImageUpload(frame3Upload, frameImg3);
+
+    // Memicu Klik Input File Tersembunyi saat Bingkai di Poster di-klik
+    frame1Elem.addEventListener('click', () => frame1Upload.click());
+    frame2Elem.addEventListener('click', () => frame2Upload.click());
+    frame3Elem.addEventListener('click', () => frame3Upload.click());
+    
+    // Ekspor/Download Gambar HD
+    const downloadBtn = document.getElementById('downloadPosterBtn');
+    downloadBtn.addEventListener('click', async () => {
+        const posterElement = document.getElementById('poster');
+        const originalText = downloadBtn.innerText;
+        downloadBtn.innerText = "⏳ Memproses HD...";
+        downloadBtn.disabled = true;
+        
+        try {
+            const canvas = await html2canvas(posterElement, {
+                scale: 2.8,
+                backgroundColor: null,
+                useCORS: true,
+                logging: false,
+                allowTaint: false
+            });
+            const link = document.createElement('a');
+            link.download = `Poster_9x16_${Date.now()}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.92);
+            link.click();
+        } catch (error) {
+            alert('Gagal membuat poster. Coba lagi.');
+        } finally {
+            downloadBtn.innerText = originalText;
+            downloadBtn.disabled = false;
+        }
+    });
+    
+    window.addEventListener('resize', () => applyLayout(parseInt(layoutSelect.value)));
+    
+    const styleInject = document.createElement('style');
+    styleInject.textContent = `
+        .polaroid img {
+            width: 100% !important; height: auto !important;
+            aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px;
+        }
+        .polaroid { transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1); }
+        .polaroid:hover {
+            transform: scale(1.02) rotate(0deg) !important;
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,0.3)); z-index: 20;
+        }
+    `;
+    document.head.appendChild(styleInject);
+    
+    displayTag.innerText = inputTag.value;
+    displayDesc.innerText = inputDesc.value;
+    
+    if (!frameImg1.src || frameImg1.src.includes('placehold')) frameImg1.src = "https://placehold.co/400x300/d9e2ef/2c3e50?text=Klik+Ubah+1";
+    if (!frameImg2.src || frameImg2.src.includes('placehold')) frameImg2.src = "https://placehold.co/400x300/b8c7e0/2c3e50?text=Klik+Ubah+2";
+    if (!frameImg3.src || frameImg3.src.includes('placehold')) frameImg3.src = "https://placehold.co/400x300/a5b9d4/2c3e50?text=Klik+Ubah+3";
+    if (!bgImg.src || bgImg.src.includes('placehold')) bgImg.src = "https://placehold.co/900x1600/0b3b5f/white?text=Background+Utama";
+    
+    const refreshCurrentLayout = () => applyLayout(parseInt(layoutSelect.value));
+    frame1Upload?.addEventListener('change', refreshCurrentLayout);
+    frame2Upload?.addEventListener('change', refreshCurrentLayout);
+    frame3Upload?.addEventListener('change', refreshCurrentLayout);
+    bgUpload?.addEventListener('change', refreshCurrentLayout);
+</script>
+</body>
+</html>
