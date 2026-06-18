@@ -41,4 +41,4 @@ Halaman ini merupakan pusat akses (_landing page_) untuk berbagai alat pendukung
 
 ---
 
-**Catatan:** Repository ini merupakan proyek personal dan tidak terafiliasi secara resmi dengan instansi pemerintah terkait Program Keluarga Harapan (PKH).
+**Catatan:** Repository ini merupakan proyek personal dan tidak terafiliasi secara resmi dengan instansi pemerintah.
