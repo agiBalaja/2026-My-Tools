@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Quote & Photo Studio | Preview & Download Ultimate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Bebas+Neue&family=Caveat:wght@600&family=Cinzel:wght@600&family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@1,500&family=Montserrat:wght@800&family=Playfair+Display:ital,wght@0,600;1,600&family=Playpen+Sans:wght@600&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'inter': ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; user-select: none; }
+        body { font-family: 'Inter', sans-serif; background: #0b1120; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #2d3a5e; border-radius: 10px; }
+
+        /* PREVIEW CANVAS CORE */
+        #preview-canvas {
+            aspect-ratio: 1 / 1;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            border-radius: 1rem;
+            transition: all 0.2s ease;
+            overflow: hidden;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.6);
+        }
+
+        /* Quote wrapper dynamic */
+        .quote-wrapper {
+            position: absolute;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            max-width: 88%;
+            z-index: 20;
+            cursor: default;
+            word-break: break-word;
+        }
+
+        /* Preset positions */
+        .pos-center { top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .pos-top-left { top: 24px; left: 24px; text-align: left; }
+        .pos-top-right { top: 24px; right: 24px; text-align: right; }
+        .pos-bottom-left { bottom: 24px; left: 24px; text-align: left; }
+        .pos-bottom-right { bottom: 24px; right: 24px; text-align: right; }
+
+        /* Background style for text wrapper */
+        .bg-none { background: transparent; backdrop-filter: none; border: none; padding: 0px; }
+        .bg-solid { background: rgba(0, 0, 0, 0.65); border-radius: 18px; padding: 16px 20px; backdrop-filter: none; border: none; }
+        .bg-glass { background: rgba(20, 30, 45, 0.35); backdrop-filter: blur(16px) saturate(180%); border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); padding: 16px 22px; }
+        .bg-gradient { background: linear-gradient(to top, rgba(0,0,0,0.85) 10%, transparent 85%); border-radius: 0px; padding: 40px 20px 20px 20px; width: 100%; max-width: 100%; }
+
+        /* Text Shadows */
+        .shadow-soft { text-shadow: 0 4px 14px rgba(0,0,0,0.7); }
+        .shadow-hard { text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; }
+        .shadow-glow { text-shadow: 0 0 8px rgba(255,255,240,0.8), 0 0 20px rgba(0,0,0,0.5); }
+        .shadow-none { text-shadow: none; }
+
+        /* ========== 10 UNIQUE PHOTO FILTERS (overlay/pseudo) ========== */
+        .style-1 { filter: none; }
+        .style-2 { filter: grayscale(100%) contrast(120%) brightness(1.02); }
+        .style-3 { filter: sepia(70%) contrast(115%) brightness(0.96); }
+        .style-4::after { content: ''; position: absolute; inset: 0; background: linear-gradient(145deg, rgba(255,215,0,0.2), rgba(255,100,0,0.25)); pointer-events: none; z-index: 2; mix-blend-mode: overlay; }
+        .style-5::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.55); pointer-events: none; z-index: 2; }
+        .style-6::after { content: ''; position: absolute; inset: 20px; border: 3px dashed rgba(255,255,200,0.7); border-radius: 30px; pointer-events: none; z-index: 3; }
+        .style-7::after { content: ''; position: absolute; inset: 14px; border: 3px solid rgba(255,255,255,0.9); border-radius: 24px; pointer-events: none; z-index: 3; box-shadow: 0 0 0 2px rgba(0,0,0,0.3); }
+        .style-8::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.85) 100%); pointer-events: none; z-index: 2; }
+        .style-9 { filter: saturate(180%) contrast(105%) brightness(1.08); }
+        .style-10::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(0,255,255,0.08), rgba(255,0,200,0.08) 15px); pointer-events: none; z-index: 2; mix-blend-mode: color-dodge; }
+
+        /* ensure pseudo-elements work on relative */
+        #preview-canvas { position: relative; }
+        #preview-canvas::before, #preview-canvas::after { transition: all 0.2s; }
+
+        /* draggable mode */
+        .draggable-active .quote-wrapper { cursor: grab; }
+        .draggable-active .quote-wrapper:active { cursor: grabbing; }
+
+        /* buttons / animation */
+        .style-btn-active { background: #14b8a6 !important; color: white !important; border-color: #0d9488 !important; box-shadow: 0 5px 12px rgba(20,184,166,0.3); }
+        .drag-toggle-active { background: #0d9488 !important; color: white !important; border-color: #0f766e !important; }
+
+        /* toast */
+        .toast-visible { transform: translateX(0); opacity: 1; transition: all 0.4s cubic-bezier(0.2, 1.2, 0.4, 1); }
+        .toast-exit { transform: translateX(120%); opacity: 0; transition: all 0.3s ease; }
+
+        /* range */
+        input[type="range"] { -webkit-appearance: none; background: transparent; }
+        input[type="range"]::-webkit-slider-track { height: 5px; border-radius: 10px; background: linear-gradient(90deg, #0d9488, #3b82f6); }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: white; border-radius: 50%; box-shadow: 0 2px 8px black; cursor: pointer; margin-top: -6px; }
+        input[type="color"]::-webkit-color-swatch { border-radius: 12px; border: none; }
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 200ms; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 min-h-screen">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <div class="container mx-auto px-4 py-6 lg:py-8 max-w-7xl">
+        <!-- Header dengan preview interaktif -->
+        <header class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 bg-teal-500/10 border border-teal-500/20 rounded-full px-4 py-1.5 mb-4">
+                <span class="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></span>
+                <span class="text-xs font-bold text-teal-400 tracking-wider">PREMIUM VISUAL STUDIO</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black bg-gradient-to-r from-teal-300 via-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight">
+                Quote & Photo Studio
+            </h1>
+            <p class="text-slate-500 mt-3 text-sm max-w-xl mx-auto">Preview real-time + unduh kualitas tinggi. Drag teks, filter sinematik, font eksklusif.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+            <!-- Panel kontrol kiri -->
+            <div class="lg:col-span-5 space-y-5">
+                <!-- Upload area -->
+                <div class="bg-slate-900/70 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60 shadow-xl">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i data-lucide="image-up" class="w-5 h-5 text-teal-400"></i>
+                        <h3 class="font-bold text-sm uppercase tracking-wider text-teal-400">1. Unggah Background</h3>
+                    </div>
+                    <label for="image-loader" id="drop-zone" class="relative flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-700 rounded-xl cursor-pointer hover:border-teal-500/70 hover:bg-teal-500/5 transition-all overflow-hidden">
+                        <div id="drop-zone-content" class="flex flex-col items-center justify-center py-4">
+                            <i data-lucide="cloud-upload" class="w-10 h-10 text-slate-500 mb-1"></i>
+                            <p class="text-sm text-slate-400 font-medium">Klik atau drag foto</p>
+                            <p class="text-xs text-slate-600">JPG, PNG, WEBP</p>
+                        </div>
+                        <div id="drop-zone-preview" class="absolute inset-0 bg-cover bg-center hidden"></div>
+                        <input type="file" id="image-loader" class="hidden" accept="image/*" />
+                    </label>
+                </div>
+
+                <!-- Kutipan Teks -->
+                <div class="bg-slate-900/70 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i data-lucide="quote" class="w-5 h-5 text-cyan-400"></i>
+                        <h3 class="font-bold text-sm uppercase text-cyan-400">2. Kutipan & Penulis</h3>
+                    </div>
+                    <textarea id="quote-text" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white placeholder-slate-600 focus:ring-2 focus:ring-teal-500/60 focus:border-teal-500 transition-all resize-none" placeholder="Tulis kutipanmu...">Hidup adalah petualangan yang berani.</textarea>
+                    <input id="author-text" type="text" class="mt-3 w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-teal-500/60" placeholder="Nama penulis (opsional)">
+                </div>
+
+                <!-- Tipografi & Warna -->
+                <div class="bg-slate-900/70 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i data-lucide="type" class="w-5 h-5 text-blue-400"></i>
+                        <h3 class="font-bold text-sm uppercase text-blue-400">3. Gaya Teks</h3>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="text-[11px] text-slate-500 uppercase">Font</label>
+                            <select id="font-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm mt-1">
+                                <option value="'Inter', sans-serif">Inter (Modern)</option>
+                                <option value="'Bebas Neue', sans-serif">Bebas Neue (Bold)</option>
+                                <option value="'Playfair Display', serif">Playfair (Elegant)</option>
+                                <option value="'Lora', serif">Lora (Italic)</option>
+                                <option value="'Caveat', cursive">Caveat (Handwrite)</option>
+                                <option value="'Montserrat', sans-serif">Montserrat (Impact)</option>
+                                <option value="'Roboto Mono', monospace">Roboto Mono (Retro)</option>
+                                <option value="'Cinzel', serif">Cinzel (Royal)</option>
+                                <option value="'Alex Brush', cursive">Alex Brush (Script)</option>
+                                <option value="'Playpen Sans', cursive">Playpen (Casual)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-500 uppercase">Ukuran <span id="size-val" class="text-teal-400">28</span>px</label>
+                            <input type="range" id="text-size" min="16" max="64" value="28" class="w-full mt-1">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-[11px] text-slate-500 uppercase">Warna Teks</label>
+                        <div class="flex items-center gap-3 mt-1 flex-wrap">
+                            <input type="color" id="text-color" value="#FFFFFF" class="w-8 h-8 rounded-xl border border-slate-700">
+                            <span id="color-hex" class="text-xs font-mono text-slate-400">#FFFFFF</span>
+                            <div class="flex gap-1 ml-auto">
+                                <button data-color="#ffffff" class="color-preset w-6 h-6 rounded-full bg-white border border-slate-600"></button>
+                                <button data-color="#facc15" class="color-preset w-6 h-6 rounded-full bg-amber-400"></button>
+                                <button data-color="#f472b6" class="color-preset w-6 h-6 rounded-full bg-pink-400"></button>
+                                <button data-color="#4ade80" class="color-preset w-6 h-6 rounded-full bg-emerald-400"></button>
+                                <button data-color="#60a5fa" class="color-preset w-6 h-6 rounded-full bg-blue-400"></button>
+                                <button data-color="#000000" class="color-preset w-6 h-6 rounded-full bg-black border border-white"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-500 uppercase">Bayangan Teks</label>
+                        <select id="shadow-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm mt-1">
+                            <option value="shadow-soft">Lembut ✦</option>
+                            <option value="shadow-hard">Stroke Tegas ▮</option>
+                            <option value="shadow-glow">Glow ☀</option>
+                            <option value="shadow-none">Tanpa Bayangan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Posisi & Alas serta filter -->
+                <div class="bg-slate-900/70 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60">
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <label class="text-[11px] text-slate-500 uppercase">Posisi Teks</label>
+                            <select id="pos-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm mt-1">
+                                <option value="pos-center">Tengah</option>
+                                <option value="pos-top-left">Kiri Atas</option>
+                                <option value="pos-top-right">Kanan Atas</option>
+                                <option value="pos-bottom-left">Kiri Bawah</option>
+                                <option value="pos-bottom-right">Kanan Bawah</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-500 uppercase">Alas Teks</label>
+                            <select id="bg-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm mt-1">
+                                <option value="bg-none">Tanpa Alas</option>
+                                <option value="bg-solid">Blok Hitam</option>
+                                <option value="bg-glass">Glassmorphism</option>
+                                <option value="bg-gradient">Gradasi Bawah</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-500 uppercase flex items-center gap-2"><i data-lucide="sparkles" class="w-3 h-3"></i> Filter & Frame Pro</label>
+                        <div class="grid grid-cols-5 gap-2 mt-2" id="style-grid"></div>
+                    </div>
+                </div>
+
+                <!-- Tombol Download dan drag toggle -->
+                <div class="flex gap-3">
+                    <button id="drag-toggle" class="flex-1 flex items-center justify-center gap-2 bg-slate-800 border border-slate-700 rounded-xl py-3 text-sm font-semibold text-slate-300 hover:text-white transition-all cursor-pointer">
+                        <i data-lucide="move" class="w-4 h-4"></i> Seret Teks
+                    </button>
+                    <button id="download-btn" class="flex-1 bg-gradient-to-r from-teal-500 to-cyan-600 hover:shadow-xl hover:shadow-teal-500/30 rounded-xl py-3 font-bold text-white flex items-center justify-center gap-2 transition-all transform active:scale-95">
+                        <i data-lucide="download" class="w-5 h-5"></i> Unduh PNG
+                    </button>
+                </div>
+                <p class="text-[11px] text-center text-slate-600 mt-2">✨ Klik "Seret Teks" lalu geser bebas di area preview</p>
+            </div>
+
+            <!-- Panel kanan: Preview area utama + download final -->
+            <div class="lg:col-span-7 flex flex-col items-center">
+                <div class="w-full max-w-[580px]">
+                    <div class="flex items-center justify-between mb-2 px-2">
+                        <div class="flex items-center gap-2 text-xs text-slate-500"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Pratinjau Langsung</div>
+                        <div class="text-[11px] bg-slate-800/50 px-3 py-1 rounded-full text-slate-400">1:1 Square</div>
+                    </div>
+                    <!-- Canvas Preview Card -->
+                    <div class="bg-black/40 backdrop-blur-sm p-3 rounded-2xl shadow-2xl border border-slate-800">
+                        <div id="preview-canvas" class="style-1 rounded-xl w-full bg-slate-800" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIiB2aWV3Qm94PSIwIDAgODAwIDgwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzFjMmEzZSIvPjxjaXJjbGUgY3g9IjQwMCIgY3k9IjQwMCIgcj0iMjUwIiBmaWxsPSIjMjA0NzQzIiBmaWxsLW9wYWNpdHk9IjAuNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNThhN2ZmIiBmb250LWZhbWlseT0iTW9ub3RleHQiIGZvbnQtc2l6ZT0iMjQiPkJhY2tncm91bmQgSW1hZ2U8L3RleHQ+PC9zdmc+'); background-size: cover;">
+                            <div id="quote-box" class="quote-wrapper pos-center bg-none">
+                                <p id="quote-display" class="font-semibold shadow-soft leading-tight transition-all" style="font-family: 'Inter', sans-serif; font-size:28px; color:#ffffff;">
+                                    "Hidup adalah petualangan yang berani."
+                                </p>
+                                <p id="author-display" class="mt-2 text-sm opacity-80 hidden transition-all" style="font-family: 'Inter', sans-serif; color:#ffffff;"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl p-3 flex gap-2 justify-center">
+                        <i data-lucide="info" class="w-3 h-3"></i> Aktifkan mode SERET untuk memposisikan teks secara bebas. Download dengan resolusi tajam 2.5x.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="mt-12 text-center text-slate-700 text-[10px]">© Quote Studio · Tanpa server · Preview & download langsung dari browser</footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        // ------------------- ELEMENTS -------------------
+        const previewCanvas = document.getElementById('preview-canvas');
+        const quoteBox = document.getElementById('quote-box');
+        const quoteDisplay = document.getElementById('quote-display');
+        const authorDisplay = document.getElementById('author-display');
+        const quoteTextarea = document.getElementById('quote-text');
+        const authorInput = document.getElementById('author-text');
+        const fontSelect = document.getElementById('font-select');
+        const textColorPicker = document.getElementById('text-color');
+        const colorHexSpan = document.getElementById('color-hex');
+        const textSizeRange = document.getElementById('text-size');
+        const sizeValSpan = document.getElementById('size-val');
+        const shadowSelect = document.getElementById('shadow-select');
+        const posSelect = document.getElementById('pos-select');
+        const bgSelect = document.getElementById('bg-select');
+        const downloadBtn = document.getElementById('download-btn');
+        const dragToggleBtn = document.getElementById('drag-toggle');
+        const imageLoader = document.getElementById('image-loader');
+        const dropZone = document.getElementById('drop-zone');
+        const dropZonePreviewDiv = document.getElementById('drop-zone-preview');
+        const dropZoneContentDiv = document.getElementById('drop-zone-content');
+
+        // ---------- STYLE GRID (10 filter) ----------
+        const styleList = [
+            { id:1, name:'Normal', icon:'image' }, { id:2, name:'B&W', icon:'contrast' },
+            { id:3, name:'Sepia', icon:'sunset' }, { id:4, name:'Glow', icon:'flame' },
+            { id:5, name:'Dark', icon:'moon' }, { id:6, name:'Dashed', icon:'square-dashed-bottom' },
+            { id:7, name:'Frame', icon:'square' }, { id:8, name:'Vignette', icon:'aperture' },
+            { id:9, name:'Vivid', icon:'rainbow' }, { id:10, name:'Cyber', icon:'zap' }
+        ];
+        const styleGrid = document.getElementById('style-grid');
+        let currentStyle = 1;
+
+        styleList.forEach(st => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `flex flex-col items-center gap-1 p-1.5 text-[10px] font-bold rounded-xl border transition-all ${st.id===1 ? 'border-teal-500 bg-teal-500/20 text-teal-300' : 'border-slate-800 bg-slate-950 text-slate-500 hover:border-slate-600'}`;
+            btn.innerHTML = `<i data-lucide="${st.icon}" class="w-3.5 h-3.5"></i><span>${st.name}</span>`;
+            btn.onclick = () => {
+                styleList.forEach(s => previewCanvas.classList.remove(`style-${s.id}`));
+                previewCanvas.classList.add(`style-${st.id}`);
+                currentStyle = st.id;
+                Array.from(styleGrid.children).forEach(c => c.classList.remove('border-teal-500', 'bg-teal-500/20', 'text-teal-300'));
+                btn.classList.add('border-teal-500', 'bg-teal-500/20', 'text-teal-300');
+            };
+            styleGrid.appendChild(btn);
+        });
+        lucide.createIcons({ nodes: styleGrid });
+
+        // Helper: refresh text layout & background wrapper
+        function refreshTextLayout() {
+            const posVal = posSelect.value;
+            const bgVal = bgSelect.value;
+            const shadowVal = shadowSelect.value;
+            quoteBox.className = `quote-wrapper ${posVal} ${bgVal}`;
+            quoteDisplay.className = `font-semibold ${shadowVal} break-words transition-all leading-snug`;
+        }
+
+        // Sync teks realtime
+        quoteTextarea.addEventListener('input', () => {
+            let txt = quoteTextarea.value.trim();
+            if(txt === "") txt = "Kutipan indah";
+            quoteDisplay.innerText = `"${txt}"`;
+        });
+        authorInput.addEventListener('input', () => {
+            if(authorInput.value.trim() !== "") {
+                authorDisplay.innerText = `— ${authorInput.value.trim()}`;
+                authorDisplay.classList.remove('hidden');
+            } else authorDisplay.classList.add('hidden');
+        });
+        fontSelect.addEventListener('change', () => {
+            quoteDisplay.style.fontFamily = fontSelect.value;
+            authorDisplay.style.fontFamily = fontSelect.value;
+        });
+        textSizeRange.addEventListener('input', () => {
+            quoteDisplay.style.fontSize = `${textSizeRange.value}px`;
+            sizeValSpan.innerText = textSizeRange.value;
+        });
+        textColorPicker.addEventListener('input', () => {
+            quoteDisplay.style.color = textColorPicker.value;
+            authorDisplay.style.color = textColorPicker.value;
+            colorHexSpan.innerText = textColorPicker.value.toUpperCase();
+        });
+        shadowSelect.addEventListener('change', refreshTextLayout);
+        posSelect.addEventListener('change', refreshTextLayout);
+        bgSelect.addEventListener('change', refreshTextLayout);
+
+        // color preset
+        document.querySelectorAll('.color-preset').forEach(preset => {
+            preset.addEventListener('click', (e) => {
+                const col = preset.dataset.color;
+                textColorPicker.value = col;
+                quoteDisplay.style.color = col;
+                authorDisplay.style.color = col;
+                colorHexSpan.innerText = col.toUpperCase();
+            });
+        });
+
+        // ---------- UPLOAD IMAGE (drag & click) ----------
+        imageLoader.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    previewCanvas.style.backgroundImage = `url(${ev.target.result})`;
+                    dropZonePreviewDiv.style.backgroundImage = `url(${ev.target.result})`;
+                    dropZonePreviewDiv.classList.remove('hidden');
+                    dropZoneContentDiv.classList.add('hidden');
+                    showToast('🖼️ Foto berhasil diunggah!', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-teal-500','bg-teal-500/10'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-teal-500','bg-teal-500/10'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-teal-500','bg-teal-500/10');
+            const file = e.dataTransfer.files[0];
+            if(file && file.type.startsWith('image/')) {
+                imageLoader.files = e.dataTransfer.files;
+                imageLoader.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // ---------- DRAG MODE (geser teks bebas) ----------
+        let dragModeActive = false;
+        let isDraggingMove = false;
+        let dragStartX = 0, dragStartY = 0, startLeft = 0, startTop = 0;
+        dragToggleBtn.addEventListener('click', () => {
+            dragModeActive = !dragModeActive;
+            if(dragModeActive) {
+                previewCanvas.classList.add('draggable-active');
+                dragToggleBtn.classList.add('drag-toggle-active');
+                // reset to absolute positions (keep current coordinates)
+                const rect = quoteBox.getBoundingClientRect();
+                const parentRect = previewCanvas.getBoundingClientRect();
+                let leftVal = quoteBox.offsetLeft;
+                let topVal = quoteBox.offsetTop;
+                if(posSelect.value === 'pos-center') {
+                    leftVal = (previewCanvas.clientWidth - quoteBox.offsetWidth)/2;
+                    topVal = (previewCanvas.clientHeight - quoteBox.offsetHeight)/2;
+                }
+                quoteBox.style.left = leftVal + 'px';
+                quoteBox.style.top = topVal + 'px';
+                quoteBox.style.right = 'auto';
+                quoteBox.style.bottom = 'auto';
+                quoteBox.style.transform = 'none';
+                posSelect.disabled = true;
+                bgSelect.disabled = false; // bg tetap bisa
+                showToast('Mode seret aktif! Geser teks di area preview', 'info');
+            } else {
+                previewCanvas.classList.remove('draggable-active');
+                dragToggleBtn.classList.remove('drag-toggle-active');
+                posSelect.disabled = false;
+                quoteBox.style.left = '';
+                quoteBox.style.top = '';
+                quoteBox.style.transform = '';
+                refreshTextLayout();
+            }
+        });
+
+        function startDrag(e) {
+            if(!dragModeActive) return;
+            e.preventDefault();
+            isDraggingMove = true;
+            const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY ?? (e.touches ? e.touches[0].clientY : 0);
+            dragStartX = clientX;
+            dragStartY = clientY;
+            startLeft = quoteBox.offsetLeft;
+            startTop = quoteBox.offsetTop;
+        }
+        function onDragMove(e) {
+            if(!isDraggingMove || !dragModeActive) return;
+            const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY ?? (e.touches ? e.touches[0].clientY : 0);
+            let dx = clientX - dragStartX;
+            let dy = clientY - dragStartY;
+            let newLeft = startLeft + dx;
+            let newTop = startTop + dy;
+            const maxX = previewCanvas.clientWidth - quoteBox.offsetWidth;
+            const maxY = previewCanvas.clientHeight - quoteBox.offsetHeight;
+            newLeft = Math.min(Math.max(0, newLeft), maxX);
+            newTop = Math.min(Math.max(0, newTop), maxY);
+            quoteBox.style.left = newLeft + 'px';
+            quoteBox.style.top = newTop + 'px';
+        }
+        function stopDrag() { isDraggingMove = false; }
+        quoteBox.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', onDragMove);
+        document.addEventListener('mouseup', stopDrag);
+        quoteBox.addEventListener('touchstart', startDrag, {passive:false});
+        document.addEventListener('touchmove', onDragMove, {passive:false});
+        document.addEventListener('touchend', stopDrag);
+
+        // ---------- TOAST ----------
+        function showToast(msg, type='success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icon = type==='success' ? 'check-circle' : (type==='error' ? 'alert-circle' : 'info');
+            toast.className = `pointer-events-auto flex items-center gap-3 bg-slate-800 border-l-4 border-teal-500 text-white rounded-xl px-4 py-3 shadow-2xl text-sm font-medium toast-visible`;
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-teal-400"></i><span>${msg}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons({ nodes: [toast] });
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 2800);
+        }
+
+        // ---------- DOWNLOAD PREMIUM (FULL PREVIEW CAPTURE) ----------
+        downloadBtn.addEventListener('click', async () => {
+            downloadBtn.disabled = true;
+            const originalHtml = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `<svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Memproses...`;
+            try {
+                // Capture dengan html2canvas 
+                const canvas = await html2canvas(previewCanvas, {
+                    scale: 2.8,
+                    backgroundColor: '#000000',
+                    useCORS: true,
+                    logging: false,
+                    allowTaint: false
+                });
+                const link = document.createElement('a');
+                link.download = `quotestudio_${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('✨ Gambar berhasil disimpan! Kualitas high-res', 'success');
+            } catch(err) {
+                console.error(err);
+                showToast('❌ Gagal mengunduh, coba lagi', 'error');
+            } finally {
+                downloadBtn.innerHTML = originalHtml;
+                downloadBtn.disabled = false;
+            }
+        });
+
+        // trigger initial text
+        quoteDisplay.innerText = `"Hidup adalah petualangan yang berani."`;
+        refreshTextLayout();
+        quoteDisplay.style.fontFamily = fontSelect.value;
+        authorDisplay.style.fontFamily = fontSelect.value;
+        // default active color preset
+        document.querySelector('.color-preset[data-color="#ffffff"]')?.classList.add('ring-2', 'ring-white');
+        showToast('Selamat datang! Unggah foto & buat desain keren', 'info');
+    </script>
+</body>
+</html>

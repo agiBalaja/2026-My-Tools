@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quote Editor & Creator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Inter:wght@400;600;800&family=Cinzel:wght@700&family=Alex+Brush&family=Bebas+Neue&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        #preview-container {
+            aspect-ratio: 4 / 5;
+            max-height: 65vh;
+        }
+        /* Untuk animasi fade in */
+        .animate-fadeIn {
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-[Poppins] min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-paintbrush text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent">Quote Designer Studio</h1>
+                    <p class="text-xs text-slate-400">Buat, kustomisasi, dan bagikan kutipan indah Anda</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 text-sm shadow-md border border-slate-600 flex-1 sm:flex-none">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Unggah Background</span>
+                    <input type="file" id="upload-bg-input" accept="image/*" class="hidden" />
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Tab Navigation & Canvas (7 kolom) -->
+        <div class="lg:col-span-7 flex flex-col gap-4">
+
+            <!-- Tab Buttons -->
+            <div class="bg-slate-800 p-3 rounded-2xl border border-slate-700 shadow-xl">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Pilih Template Gambar</span>
+                    <span id="tab-indicator" class="text-xs text-slate-400 font-medium">Gambar 1 dari 10</span>
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar snap-x" id="tabs-container">
+                    <!-- Tabs akan di-generate oleh JS -->
+                </div>
+            </div>
+
+            <!-- Canvas Preview -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl p-4 flex flex-col items-center justify-center relative group">
+
+                <div id="preview-wrapper" class="relative overflow-hidden rounded-xl shadow-lg border border-slate-700 w-full max-w-md bg-black flex items-center justify-center">
+
+                    <!-- Background Image -->
+                    <img id="bg-image-preview" src="1000305577.jpg" alt="Background" class="w-full h-full object-cover select-none pointer-events-none transition-all duration-300" />
+
+                    <!-- Overlay -->
+                    <div id="overlay" class="absolute inset-0 bg-black/30 pointer-events-none transition-all duration-200"></div>
+
+                    <!-- Text Layer -->
+                    <div id="text-layer" class="absolute w-[85%] text-center cursor-move p-4 select-none" style="top:50%; left:50%; transform:translate(-50%, -50%);">
+                        <div id="text-container" class="relative transition-all duration-100 leading-relaxed">
+                            <p id="quote-text-primary" class="font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></p>
+                            <p id="quote-text-secondary" class="font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mt-3"></p>
+                        </div>
+                    </div>
+
+                    <!-- Watermark -->
+                    <div class="absolute bottom-3 right-3 text-[10px] text-white/50 font-mono tracking-widest pointer-events-none uppercase">...</div>
+                </div>
+
+                <p class="text-xs text-slate-400 mt-3 text-center flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-indigo-400"></i>
+                    <span>Gunakan panel kanan untuk menyesuaikan isi teks, jenis tulisan, ukuran, warna, dan posisi (seret teks untuk mengubah posisi).</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Customization Controls (5 kolom) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 flex flex-col gap-5">
+                <div class="border-b border-slate-700 pb-3">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-500"></i>
+                        <span>Studio Pengaturan</span>
+                    </h2>
+                </div>
+
+                <!-- Text Editor Tabs -->
+                <div class="flex bg-slate-900/60 p-1 rounded-xl border border-slate-700">
+                    <button id="btn-tab-text1" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition duration-200">
+                        Teks Utama
+                    </button>
+                    <button id="btn-tab-text2" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition duration-200">
+                        Teks Pendukung
+                    </button>
+                </div>
+
+                <!-- Editor Input -->
+                <div class="flex flex-col gap-3">
+                    <div id="editor-text-1-group">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Isi Teks Utama</label>
+                        <textarea id="text-input-primary" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none" placeholder="Masukkan teks utama di sini..."></textarea>
+                    </div>
+                    <div id="editor-text-2-group" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Isi Teks Pendukung (Optional)</label>
+                        <textarea id="text-input-secondary" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none" placeholder="Masukkan teks pendukung atau nama pengutip..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Typography -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-700 pb-1.5">Tipografi & Gaya</h3>
+
+                    <!-- Font Selector -->
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1.5">Pilih Font</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Playfair Display">
+                                <span class="font-[Playfair Display]">Elegant Serif</span>
+                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
+                            </button>
+                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Caveat">
+                                <span class="font-[Caveat] text-sm">Handwritten</span>
+                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
+                            </button>
+                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Montserrat">
+                                <span class="font-[Montserrat]">Montserrat</span>
+                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
+                            </button>
+                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Bebas Neue">
+                                <span class="font-[Bebas Neue] tracking-wide">Bebas Neue</span>
+                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
+                            </button>
+                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Alex Brush">
+                                <span class="font-[Alex Brush] text-sm">Romance</span>
+                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
+                            </button>
+                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Inter">
+                                <span class="font-[Inter]">Modern Clean</span>
+                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Size & Weight -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1">Ukuran Font</label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="font-size-slider" min="14" max="42" value="22" class="w-full accent-indigo-500 bg-slate-900 h-1.5 rounded-lg cursor-pointer" />
+                                <span id="font-size-val" class="text-xs text-slate-400 w-8 text-right">22px</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1">Ketebalan Font</label>
+                            <select id="font-weight-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-1 px-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <option value="normal">Normal</option>
+                                <option value="600">Medium</option>
+                                <option value="bold" selected>Bold</option>
+                                <option value="800">Ultra Bold</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Layout: Alignment -->
+                    <div class="space-y-3 pt-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-300">Penataan Baris (Align)</span>
+                            <div class="flex bg-slate-900 rounded-lg p-0.5 border border-slate-700">
+                                <button class="align-opt px-2.5 py-1 text-xs rounded hover:bg-slate-800 transition" data-align="left"><i class="fa-solid fa-align-left"></i></button>
+                                <button class="align-opt px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-800 transition text-indigo-400" data-align="center"><i class="fa-solid fa-align-center"></i></button>
+                                <button class="align-opt px-2.5 py-1 text-xs rounded hover:bg-slate-800 transition" data-align="right"><i class="fa-solid fa-align-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Effects -->
+                    <div class="space-y-3 pt-2">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-700 pb-1.5">Efek Visual</h3>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-slate-300 mb-1">Warna Teks</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="text-color-input" value="#ffffff" class="w-8 h-8 rounded-lg cursor-pointer border border-slate-700 bg-transparent" />
+                                    <span id="text-color-hex" class="text-xs font-mono text-slate-400">#FFFFFF</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-300 mb-1">Kecerahan Latar</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="range" id="overlay-slider" min="0" max="90" value="30" class="w-full accent-indigo-500 bg-slate-900 h-1.5 rounded-lg cursor-pointer" />
+                                    <span id="overlay-val" class="text-xs text-slate-400 w-8 text-right">30%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1">Efek Bayangan Teks</label>
+                            <select id="shadow-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-1 px-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <option value="soft">Bayangan Lembut (Soft Shadow)</option>
+                                <option value="hard" selected>Bayangan Tajam (High Contrast)</option>
+                                <option value="glow">Efek Cahaya (Glow)</option>
+                                <option value="none">Tanpa Bayangan</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-700">
+                    <button id="download-btn" class="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-900/30 transition duration-150 flex items-center justify-center gap-2.5">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh Hasil</span>
+                    </button>
+                    <button id="share-toggle-btn" class="bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-500 hover:to-purple-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-900/30 transition duration-150 flex items-center justify-center gap-2.5">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span>Bagikan Desain</span>
+                    </button>
+                </div>
+
+                <!-- Share Panel -->
+                <div id="share-panel" class="hidden bg-slate-900 p-4 rounded-xl border border-slate-700/60 transition-all duration-300 animate-fadeIn">
+                    <p class="text-xs font-semibold text-slate-300 mb-2.5 flex items-center justify-between">
+                        <span>Pilih Platform Berbagi</span>
+                        <button id="close-share" class="text-slate-500 hover:text-slate-300 text-sm"><i class="fa-solid fa-xmark"></i></button>
+                    </p>
+                    <div class="grid grid-cols-4 gap-2 mb-3">
+                        <button id="share-wa" class="flex flex-col items-center justify-center gap-1.5 bg-slate-800 p-2.5 rounded-lg hover:bg-slate-700 text-green-400 transition">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                            <span class="text-[9px] text-slate-300">WhatsApp</span>
+                        </button>
+                        <button id="share-x" class="flex flex-col items-center justify-center gap-1.5 bg-slate-800 p-2.5 rounded-lg hover:bg-slate-700 text-white transition">
+                            <i class="fa-brands fa-x-twitter text-lg"></i>
+                            <span class="text-[9px] text-slate-300">X / Twitter</span>
+                        </button>
+                        <button id="share-fb" class="flex flex-col items-center justify-center gap-1.5 bg-slate-800 p-2.5 rounded-lg hover:bg-slate-700 text-blue-500 transition">
+                            <i class="fa-brands fa-facebook text-lg"></i>
+                            <span class="text-[9px] text-slate-300">Facebook</span>
+                        </button>
+                        <button id="share-native" class="flex flex-col items-center justify-center gap-1.5 bg-slate-800 p-2.5 rounded-lg hover:bg-slate-700 text-indigo-400 transition">
+                            <i class="fa-solid fa-mobile-screen text-lg"></i>
+                            <span class="text-[9px] text-slate-300">Lainnya</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
+                        <input id="share-link-input" type="text" readonly value="https://quotes-generator.app" class="bg-transparent border-none text-[11px] text-slate-400 w-full focus:outline-none px-2 select-all" />
+                        <button id="copy-link-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold py-1 px-3 rounded transition-all whitespace-nowrap">
+                            Copy Link
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-12 opacity-0 pointer-events-none transition-all duration-300 bg-slate-800 border-l-4 border-emerald-500 text-white px-4 py-3.5 rounded-lg shadow-2xl flex items-center gap-3">
+        <div class="bg-emerald-500/20 p-1.5 rounded-full text-emerald-400">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div>
+            <p id="toast-title" class="font-bold text-xs text-white">Sukses</p>
+            <p id="toast-msg" class="text-[11px] text-slate-400">Desain berhasil diproses!</p>
+        </div>
+    </div>
+
+    <script>
+        // ========== DATA TEMPLATE ==========
+        const defaultTemplates = [{
+            id: 1,
+            fileName: "1000305577.jpg",
+            title: "Inspirational Rose",
+            primaryText: "You're not like the others, and that's not just okay but it's totally beautiful...",
+            secondaryText: "Always be yourself...",
+            fontFamily: "Caveat",
+            fontSize: 22,
+            fontWeight: "bold",
+            color: "#ffffff",
+            overlay: 30,
+            align: "center",
+            shadow: "hard",
+            posX: 50,
+            posY: 50
+        }, {
+            id: 2,
+            fileName: "1000305576.jpg",
+            title: "Valuable Peace",
+            primaryText: "“Protect your peace like it's your most valuable possession, because it is.",
+            secondaryText: "",
+            fontFamily: "Playfair Display",
+            fontSize: 26,
+            fontWeight: "bold",
+            color: "#ffffff",
+            overlay: 25,
+            align: "center",
+            shadow: "hard",
+            posX: 50,
+            posY: 50
+        }, {
+            id: 3,
+            fileName: "1000305575.jpg",
+            title: "Positivity & Joy",
+            primaryText: "The best way to be happy is to turn the negatives into positives, don't let anyone steals your joy, and be thankful for what you have.",
+            secondaryText: "",
+            fontFamily: "Montserrat",
+            fontSize: 18,
+            fontWeight: "600",
+            color: "#1e1b4b",
+            overlay: 15,
+            align: "center",
+            shadow: "none",
+            posX: 50,
+            posY: 50
+        }, {
+            id: 4,
+            fileName: "1000305573.jpg",
+            title: "Self-Worth",
+            primaryText: "You lose nothing when you walk away from someone who treats you like you're worth nothing.",
+            secondaryText: "",
+            fontFamily: "Inter",
+            fontSize: 24,
+            fontWeight: "800",
+            color: "#ffffff",
+            overlay: 45,
+            align: "center",
+            shadow: "hard",
+            posX: 50,
+            posY: 50
+        }, {
+            id: 5,
+            fileName: "1000305574.jpg",
+            title: "Trust Caution",
+            primaryText: "BE CAREFUL WHO YOU TRUST SOME PEOPLE HAVE MORE FACES THAN YOU COULD IMAGINE",
+            secondaryText: "Kata-kata hari ini",
+            fontFamily: "Bebas Neue",
+            fontSize: 32,
+            fontWeight: "normal",
+            color: "#ffffff",
+            overlay: 35,
+            align: "center",
+            shadow: "hard",
+            posX: 50,
+            posY: 50
+        }, {
+            id: 6,
+            fileName: "1000305572.jpg",
+            title: "Unapologetic Self",
+            primaryText: "I will never change my personality to make someone love me, loving me is your choice and hate me is your decision.",
+            secondaryText: "",
+            fontFamily: "Playfair Display",
+            fontSize: 24,
+            fontWeight: "bold",
+            color: "#ffffff",
+            overlay: 35,
+            align: "center",
+            shadow: "hard",
+            posX: 50,
+            posY: 50
+        }, {
+            id: 7,
+            fileName: "1000305571.jpg",
+            title: "Private Life",
+            primaryText: "I keep my personal life private. So don't think you know me. You only know what I allow you to know.",
+            secondaryText: "",
+            fontFamily: "Inter",
+            fontSize: 22,
+            fontWeight: "600",
+            color: "#ffffff",
+            overlay: 40,
+            align: "left",
+            shadow: "hard",
+            posX: 50,
+            posY: 50
+        }, {
+            id: 8,
+            fileName: "1000305570.jpg",
+            title: "Hard Days",
+            primaryText: "SOMETIMES, WE NEED HARD DAYS TO SEE",
+            secondaryText: "who's family, who's a true friend, who's a partner, and who's just passing through our life.",
+            fontFamily: "Montserrat",
+            fontSize: 20,
+            fontWeight: "bold",
+            color: "#e2e8f0",
+            overlay: 50,
+            align: "center",
+            shadow: "soft",
+            posX: 50,
+            posY: 50
+        }, {
+            id: 9,
+            fileName: "1000305566.jpg",
+            title: "Independence Lion",
+            primaryText: "I DON'T LET PEOPLE THINK I CAN'T LIVE WITHOUT THEM. I REMIND THEM THERE WAS A TIME I DIDN'T KNOW THEM... AND I WAS DOING JUST FINE.",
+            secondaryText: "REAL QUOTES",
+            fontFamily: "Bebas Neue",
+            fontSize: 28,
+            fontWeight: "normal",
+            color: "#ffffff",
+            overlay: 30,
+            align: "left",
+            shadow: "hard",
+            posX: 50,
+            posY: 50
+        }, {
+            id: 10,
+            fileName: "1000305567.jpg",
+            title: "Kembang Biak",
+            primaryText: "“jangan berkembang biak sebelum berkembang baik”",
+            secondaryText: "",
+            fontFamily: "Inter",
+            fontSize: 26,
+            fontWeight: "800",
+            color: "#0f172a",
+            overlay: 10,
+            align: "left",
+            shadow: "none",
+            posX: 50,
+            posY: 50
+        }];
+
+        // ========== STATE ==========
+        let currentTemplateIdx = 0;
+        let activeTextGroup = 'primary';
+        let templateData = JSON.parse(JSON.stringify(defaultTemplates));
+
+        // DOM elements
+        const tabsContainer = document.getElementById('tabs-container');
+        const bgImagePreview = document.getElementById('bg-image-preview');
+        const overlay = document.getElementById('overlay');
+        const textLayer = document.getElementById('text-layer');
+        const quoteTextPrimary = document.getElementById('quote-text-primary');
+        const quoteTextSecondary = document.getElementById('quote-text-secondary');
+        const tabIndicator = document.getElementById('tab-indicator');
+
+        const textInputPrimary = document.getElementById('text-input-primary');
+        const textInputSecondary = document.getElementById('text-input-secondary');
+        const fontSizeSlider = document.getElementById('font-size-slider');
+        const fontSizeVal = document.getElementById('font-size-val');
+        const fontWeightSelect = document.getElementById('font-weight-select');
+        const textColorInput = document.getElementById('text-color-input');
+        const textColorHex = document.getElementById('text-color-hex');
+        const overlaySlider = document.getElementById('overlay-slider');
+        const overlayVal = document.getElementById('overlay-val');
+        const shadowSelect = document.getElementById('shadow-select');
+        const uploadBgInput = document.getElementById('upload-bg-input');
+
+        const btnTabText1 = document.getElementById('btn-tab-text1');
+        const btnTabText2 = document.getElementById('btn-tab-text2');
+        const editorText1Group = document.getElementById('editor-text-1-group');
+        const editorText2Group = document.getElementById('editor-text-2-group');
+        const downloadBtn = document.getElementById('download-btn');
+        const shareToggleBtn = document.getElementById('share-toggle-btn');
+        const sharePanel = document.getElementById('share-panel');
+        const closeShare = document.getElementById('close-share');
+        const copyLinkBtn = document.getElementById('copy-link-btn');
+
+        const toast = document.getElementById('toast');
+        const toastTitle = document.getElementById('toast-title');
+        const toastMsg = document.getElementById('toast-msg');
+
+        // ========== HELPER: TOAST ==========
+        function showToast(title, message, isSuccess = true) {
+            toastTitle.innerText = title;
+            toastMsg.innerText = message;
+            if (isSuccess) {
+                toast.classList.remove('border-rose-500');
+                toast.classList.add('border-emerald-500');
+            } else {
+                toast.classList.remove('border-emerald-500');
+                toast.classList.add('border-rose-500');
+            }
+            toast.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // ========== TAB SYSTEM ==========
+        function initTabs() {
+            tabsContainer.innerHTML = '';
+            templateData.forEach((temp, idx) => {
+                const tabButton = document.createElement('button');
+                tabButton.className =
+                    `snap-start flex-shrink-0 flex items-center gap-2 border px-3 py-2 rounded-xl text-xs font-semibold transition duration-150 ${idx === currentTemplateIdx ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:text-slate-200'}`;
+                tabButton.innerHTML = `
+                    <div class="w-6 h-6 rounded bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center text-[10px]">
+                        ${idx + 1}
+                    </div>
+                    <span class="whitespace-nowrap">${temp.title}</span>
+                `;
+                tabButton.addEventListener('click', () => {
+                    saveCurrentState();
+                    currentTemplateIdx = idx;
+                    renderTemplate(currentTemplateIdx);
+                    updateTabStyles();
+                });
+                tabsContainer.appendChild(tabButton);
+            });
+            updateTabIndicator();
+        }
+
+        function updateTabStyles() {
+            const tabs = tabsContainer.querySelectorAll('button');
+            tabs.forEach((tab, idx) => {
+                if (idx === currentTemplateIdx) {
+                    tab.className =
+                        `snap-start flex-shrink-0 flex items-center gap-2 border px-3 py-2 rounded-xl text-xs font-semibold transition duration-150 bg-indigo-600 border-indigo-500 text-white shadow-md`;
+                } else {
+                    tab.className =
+                        `snap-start flex-shrink-0 flex items-center gap-2 border px-3 py-2 rounded-xl text-xs font-semibold transition duration-150 bg-slate-900/60 border-slate-700 text-slate-400 hover:text-slate-200`;
+                }
+            });
+            updateTabIndicator();
+        }
+
+        function updateTabIndicator() {
+            tabIndicator.innerText = `Gambar ${currentTemplateIdx + 1} dari ${templateData.length}`;
+        }
+
+        // ========== SAVE CURRENT STATE ==========
+        function saveCurrentState() {
+            const current = templateData[currentTemplateIdx];
+            current.primaryText = textInputPrimary.value;
+            current.secondaryText = textInputSecondary.value;
+            current.fontSize = parseInt(fontSizeSlider.value);
+            current.fontWeight = fontWeightSelect.value;
+            current.color = textColorInput.value;
+            current.overlay = parseInt(overlaySlider.value);
+            current.shadow = shadowSelect.value;
+            // alignment diupdate langsung via event listener align
+        }
+
+        // ========== RENDER TEMPLATE ==========
+        function renderTemplate(idx) {
+            const temp = templateData[idx];
+
+            // Background image
+            bgImagePreview.src = temp.fileName;
+            bgImagePreview.onerror = function() {
+                const colors = [
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    "linear-gradient(135deg, #13547a 0%, #80d0c7 100%)",
+                    "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+                    "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)",
+                    "linear-gradient(135deg, #ff0844 0%, #ffb199 100%)",
+                    "linear-gradient(135deg, #111827 0%, #1f2937 100%)",
+                    "linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
+                    "linear-gradient(135deg, #fdfbf7 0%, #ebedee 100%)",
+                    "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
+                    "linear-gradient(135deg, #e6e9f0 0%, #eef1f5 100%)"
+                ];
+                bgImagePreview.style.display = 'none';
+                bgImagePreview.parentElement.style.background = colors[idx % colors.length];
+            };
+            bgImagePreview.style.display = 'block';
+            bgImagePreview.parentElement.style.background = '';
+
+            // Set form values
+            textInputPrimary.value = temp.primaryText;
+            textInputSecondary.value = temp.secondaryText;
+            fontSizeSlider.value = temp.fontSize;
+            fontSizeVal.innerText = temp.fontSize + 'px';
+            fontWeightSelect.value = temp.fontWeight;
+
+            textColorInput.value = temp.color;
+            textColorHex.innerText = temp.color.toUpperCase();
+            overlaySlider.value = temp.overlay;
+            overlayVal.innerText = temp.overlay + '%';
+            shadowSelect.value = temp.shadow;
+
+            // Set posisi teks dari data
+            textLayer.style.left = temp.posX + '%';
+            textLayer.style.top = temp.posY + '%';
+            textLayer.style.transform = 'translate(-50%, -50%)';
+
+            // Render canvas
+            updateCanvasElements();
+        }
+
+        // ========== UPDATE CANVAS (tanpa mengubah posisi) ==========
+        function updateCanvasElements() {
+            const temp = templateData[currentTemplateIdx];
+
+            quoteTextPrimary.innerText = textInputPrimary.value;
+            quoteTextSecondary.innerText = textInputSecondary.value;
+
+            // Font
+            const activeFont = temp.fontFamily;
+            quoteTextPrimary.style.fontFamily = activeFont;
+            quoteTextSecondary.style.fontFamily = (activeFont === 'Caveat' || activeFont === 'Alex Brush') ? 'Montserrat' :
+                activeFont;
+
+            quoteTextPrimary.style.fontSize = fontSizeSlider.value + 'px';
+            quoteTextSecondary.style.fontSize = Math.max(12, parseInt(fontSizeSlider.value) * 0.6) + 'px';
+
+            quoteTextPrimary.style.fontWeight = fontWeightSelect.value;
+            quoteTextSecondary.style.fontWeight = 'normal';
+
+            // Alignment
+            textLayer.style.textAlign = temp.align;
+            document.querySelectorAll('.align-opt').forEach(btn => {
+                if (btn.getAttribute('data-align') === temp.align) {
+                    btn.classList.add('bg-slate-800', 'text-indigo-400');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-slate-800', 'text-indigo-400');
+                }
+            });
+
+            // Color
+            quoteTextPrimary.style.color = textColorInput.value;
+            quoteTextSecondary.style.color = textColorInput.value;
+            textColorHex.innerText = textColorInput.value.toUpperCase();
+
+            // Overlay
+            overlay.style.backgroundColor = `rgba(0, 0, 0, ${overlaySlider.value / 100})`;
+            overlayVal.innerText = overlaySlider.value + '%';
+
+            // Font option checkmark
+            document.querySelectorAll('.font-option').forEach(btn => {
+                const checkIcon = btn.querySelector('i');
+                if (btn.getAttribute('data-font') === temp.fontFamily) {
+                    btn.classList.add('border-indigo-500', 'bg-indigo-600/10');
+                    checkIcon.classList.remove('opacity-0');
+                    checkIcon.classList.add('opacity-100');
+                } else {
+                    btn.classList.remove('border-indigo-500', 'bg-indigo-600/10');
+                    checkIcon.classList.add('opacity-0');
+                    checkIcon.classList.remove('opacity-100');
+                }
+            });
+
+            // Shadow
+            let shadowStyle = '';
+            if (shadowSelect.value === 'soft') {
+                shadowStyle = '0 2px 8px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3)';
+            } else if (shadowSelect.value === 'hard') {
+                shadowStyle = '1px 1px 0px #000, 2px 2px 0px #000, 3px 3px 4px rgba(0,0,0,0.9)';
+            } else if (shadowSelect.value === 'glow') {
+                const color = textColorInput.value;
+                shadowStyle = `0 0 10px ${color}, 0 0 20px rgba(255,255,255,0.4)`;
+            } else {
+                shadowStyle = 'none';
+            }
+            quoteTextPrimary.style.textShadow = shadowStyle;
+            quoteTextSecondary.style.textShadow = shadowStyle;
+        }
+
+        // ========== EVENT LISTENERS ==========
+        textInputPrimary.addEventListener('input', () => {
+            templateData[currentTemplateIdx].primaryText = textInputPrimary.value;
+            updateCanvasElements();
+        });
+        textInputSecondary.addEventListener('input', () => {
+            templateData[currentTemplateIdx].secondaryText = textInputSecondary.value;
+            updateCanvasElements();
+        });
+        fontSizeSlider.addEventListener('input', () => {
+            fontSizeVal.innerText = fontSizeSlider.value + 'px';
+            templateData[currentTemplateIdx].fontSize = parseInt(fontSizeSlider.value);
+            updateCanvasElements();
+        });
+        fontWeightSelect.addEventListener('change', () => {
+            templateData[currentTemplateIdx].fontWeight = fontWeightSelect.value;
+            updateCanvasElements();
+        });
+        textColorInput.addEventListener('input', () => {
+            templateData[currentTemplateIdx].color = textColorInput.value;
+            updateCanvasElements();
+        });
+        overlaySlider.addEventListener('input', () => {
+            overlayVal.innerText = overlaySlider.value + '%';
+            templateData[currentTemplateIdx].overlay = parseInt(overlaySlider.value);
+            updateCanvasElements();
+        });
+        shadowSelect.addEventListener('change', () => {
+            templateData[currentTemplateIdx].shadow = shadowSelect.value;
+            updateCanvasElements();
+        });
+
+        // Alignment
+        document.querySelectorAll('.align-opt').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const align = btn.getAttribute('data-align');
+                templateData[currentTemplateIdx].align = align;
+                updateCanvasElements();
+            });
+        });
+
+        // Font option
+        document.querySelectorAll('.font-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const font = btn.getAttribute('data-font');
+                templateData[currentTemplateIdx].fontFamily = font;
+                updateCanvasElements();
+            });
+        });
+
+        // Upload background
+        uploadBgInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    templateData[currentTemplateIdx].fileName = event.target.result;
+                    bgImagePreview.style.display = 'block';
+                    bgImagePreview.parentElement.style.background = '';
+                    renderTemplate(currentTemplateIdx);
+                    showToast("Latar belakang Diganti", "Gambar Anda berhasil diunggah dan terpasang!");
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Editor tabs (Text 1 / Text 2)
+        btnTabText1.addEventListener('click', () => {
+            activeTextGroup = 'primary';
+            btnTabText1.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition duration-200";
+            btnTabText2.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition duration-200";
+            editorText1Group.classList.remove('hidden');
+            editorText2Group.classList.add('hidden');
+        });
+        btnTabText2.addEventListener('click', () => {
+            activeTextGroup = 'secondary';
+            btnTabText2.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition duration-200";
+            btnTabText1.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition duration-200";
+            editorText2Group.classList.remove('hidden');
+            editorText1Group.classList.add('hidden');
+        });
+
+        // ========== DOWNLOAD ==========
+        downloadBtn.addEventListener('click', () => {
+            downloadBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Sedang Memproses...</span>`;
+            downloadBtn.disabled = true;
+
+            setTimeout(() => {
+                const container = document.getElementById('preview-wrapper');
+                const options = {
+                    allowTaint: true,
+                    useCORS: true,
+                    scale: 3,
+                    logging: false
+                };
+                html2canvas(container, options).then(canvas => {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = `Quote_Studio_${templateData[currentTemplateIdx].title.replace(/\s+/g, '_')}.png`;
+                    link.href = dataUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> <span>Unduh Hasil</span>`;
+                    downloadBtn.disabled = false;
+                    showToast("Unduhan Sukses!", "Gambar beresolusi tinggi berhasil disimpan ke perangkat Anda.");
+                }).catch(err => {
+                    console.error("Gagal merender gambar:", err);
+                    downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> <span>Unduh Hasil</span>`;
+                    downloadBtn.disabled = false;
+                    showToast("Kesalahan Render", "Maaf, terjadi masalah saat membuat file gambar.", false);
+                });
+            }, 300);
+        });
+
+        // ========== SHARE PANEL TOGGLE ==========
+        shareToggleBtn.addEventListener('click', () => {
+            sharePanel.classList.toggle('hidden');
+        });
+        closeShare.addEventListener('click', () => {
+            sharePanel.classList.add('hidden');
+        });
+
+        // ========== SHARE BUTTONS (dipasang sekali) ==========
+        document.getElementById('share-wa').addEventListener('click', () => {
+            const text = encodeURIComponent(`"${templateData[currentTemplateIdx].primaryText}" - Dibuat dengan Quote Designer Studio`);
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://api.whatsapp.com/send?text=${text}%20${url}`, '_blank');
+        });
+        document.getElementById('share-x').addEventListener('click', () => {
+            const text = encodeURIComponent(`"${templateData[currentTemplateIdx].primaryText}"`);
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+        });
+        document.getElementById('share-fb').addEventListener('click', () => {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        });
+        document.getElementById('share-native').addEventListener('click', async () => {
+            const shareData = {
+                title: 'Quote Creator Studio',
+                text: `"${templateData[currentTemplateIdx].primaryText}"`,
+                url: window.location.href
+            };
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('User cancelled or Web Share failed', err);
+                }
+            } else {
+                copyToClipboard();
+            }
+        });
+
+        // ========== COPY LINK ==========
+        function copyToClipboard() {
+            const input = document.getElementById('share-link-input');
+            input.value = window.location.href;
+            try {
+                input.select();
+                input.setSelectionRange(0, 99999);
+                document.execCommand('copy');
+                const origText = copyLinkBtn.innerText;
+                copyLinkBtn.innerText = "Copied!";
+                copyLinkBtn.className = "bg-emerald-600 text-white text-[11px] font-bold py-1 px-3 rounded transition-all whitespace-nowrap";
+                setTimeout(() => {
+                    copyLinkBtn.innerText = origText;
+                    copyLinkBtn.className = "bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold py-1 px-3 rounded transition-all whitespace-nowrap";
+                }, 2000);
+                showToast("Tautan Disalin!", "Tautan aplikasi telah disalin ke papan klip Anda.");
+            } catch (err) {
+                showToast("Gagal Menyalin", "Gunakan seleksi manual pada kotak input teks tautan.", false);
+            }
+        }
+        copyLinkBtn.addEventListener('click', copyToClipboard);
+
+        // ========== DRAG TEXT (diperbaiki) ==========
+        let isDragging = false;
+        let dragStartX = 0,
+            dragStartY = 0;
+        let startPosX = 50,
+            startPosY = 50;
+
+        function startDrag(e) {
+            const touch = e.touches ? e.touches[0] : e;
+            const parent = document.getElementById('preview-wrapper');
+            const parentRect = parent.getBoundingClientRect();
+
+            // Ambil posisi persen saat ini dari style
+            const left = parseFloat(textLayer.style.left) || 50;
+            const top = parseFloat(textLayer.style.top) || 50;
+            startPosX = left;
+            startPosY = top;
+
+            dragStartX = touch.clientX;
+            dragStartY = touch.clientY;
+            isDragging = true;
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const touch = e.touches ? e.touches[0] : e;
+            const parent = document.getElementById('preview-wrapper');
+            const parentRect = parent.getBoundingClientRect();
+
+            const deltaX = touch.clientX - dragStartX;
+            const deltaY = touch.clientY - dragStartY;
+
+            let newX = startPosX + (deltaX / parentRect.width) * 100;
+            let newY = startPosY + (deltaY / parentRect.height) * 100;
+
+            // Batasi agar tidak keluar area (0-100%)
+            newX = Math.min(100, Math.max(0, newX));
+            newY = Math.min(100, Math.max(0, newY));
+
+            textLayer.style.left = newX + '%';
+            textLayer.style.top = newY + '%';
+            textLayer.style.transform = 'translate(-50%, -50%)';
+        }
+
+        function stopDrag() {
+            if (isDragging) {
+                const left = parseFloat(textLayer.style.left) || 50;
+                const top = parseFloat(textLayer.style.top) || 50;
+                templateData[currentTemplateIdx].posX = left;
+                templateData[currentTemplateIdx].posY = top;
+                isDragging = false;
+            }
+        }
+
+        textLayer.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+
+        textLayer.addEventListener('touchstart', startDrag);
+        document.addEventListener('touchmove', drag, { passive: false });
+        document.addEventListener('touchend', stopDrag);
+
+        // ========== INIT ==========
+        window.onload = function() {
+            initTabs();
+            renderTemplate(currentTemplateIdx);
+        };
+    </script>
+</body>
+                                </html>

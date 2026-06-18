@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Frame Berita Singkat v2.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --theme-color: #cc0000;
+            --accent-color: #ffcc00;
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { color: #222; margin-bottom: 5px; text-align: center;}
+        p { color: #666; margin-top: 0; margin-bottom: 25px; text-align: center; }
+
+        .main-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            max-width: 1000px;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* --- PREVIEW FRAME --- */
+        .frame-container {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            background-color: #333;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            flex-shrink: 0;
+        }
+
+        .user-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            display: none;
+        }
+
+        .placeholder-text {
+            color: #aaa;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+            font-weight: 500;
+        }
+
+        /* --- OVERLAY FRAME UTAMA --- */
+        .news-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            pointer-events: none;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .live-badge {
+            background-color: var(--theme-color);
+            color: var(--text-color);
+            font-weight: bold;
+            padding: 6px 12px;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-radius: 2px;
+            animation: blink 1.5s infinite;
+        }
+
+        .source-badge {
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            backdrop-filter: blur(4px);
+        }
+
+        .bottom-bar {
+            width: 100%;
+        }
+
+        .ribbon-tag {
+            background-color: var(--theme-color);
+            color: var(--text-color);
+            font-weight: 900;
+            font-style: italic;
+            padding: 6px 14px;
+            display: inline-block;
+            text-transform: uppercase;
+            font-size: 15px;
+            letter-spacing: 1px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .headline-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #111;
+            padding: 12px 15px;
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-left: 6px solid var(--accent-color);
+            margin-top: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            word-wrap: break-word;
+        }
+
+        /* --- CONTROL PANEL --- */
+        .control-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            flex-grow: 1;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #444;
+            text-transform: uppercase;
+        }
+
+        input[type="text"], input[type="file"], select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        select { cursor: pointer; background: #fff; }
+
+        /* Button Unduh */
+        .btn-download {
+            background-color: #218838;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .btn-download:hover { background-color: #1e7e34; }
+        .btn-download:active { transform: scale(0.98); }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .main-wrapper { flex-direction: column; align-items: center; }
+            .frame-container { width: 100%; max-width: 400px; height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Generator Berita Singkat</h1>
+    <p>Upload foto, pilih jenis berita yang cocok, lalu unduh hasilnya!</p>
+
+    <div class="main-wrapper">
+        <div class="frame-container" id="frameToCapture">
+            <div class="placeholder-text" id="placeholder">Belum Ada Foto<br><small>Silakan upload di panel kanan</small></div>
+            <img id="user-img" class="user-photo" src="#" alt="User Image">
+
+            <div class="news-overlay">
+                <div class="top-bar">
+                    <div class="live-badge" id="live-tag">● LIVE</div>
+                    <div class="source-badge" id="source-tag">SEKILAS INFO</div>
+                </div>
+                
+                <div class="bottom-bar">
+                    <div class="ribbon-tag" id="ribbon-title">BREAKING NEWS</div>
+                    <div class="headline-container" id="headline-text">Ketik teks berita Anda di kolom input!</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="form-group">
+                <label>1. Upload Gambar</label>
+                <input type="file" id="file-input" accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <label>2. Pilih Tema Frame Berita</label>
+                <select id="theme-select">
+                    <option value="breaking">🚨 Breaking News (Merah Bold)</option>
+                    <option value="gosip">🤫 Kabar Gosip (Pink Hot)</option>
+                    <option value="kriminal">🚔 Info Kriminal (Hitam/Kuning)</option>
+                    <option value="sport">⚽ Kabar Olahraga (Hijau Lapangan)</option>
+                    <option value="tech">⚡ Info Teknologi (Cyber Blue)</option>
+                    <option value="ekonomi">📈 Berita Bisnis (Biru Navy)</option>
+                    <option value="politik">🏛️ Sidang Politik (Abu-abu Formal)</option>
+                    <option value="cuaca">☀️ Laporan Cuaca (Oranye Cerah)</option>
+                    <option value="gaming">🎮 Dunia Gaming (Ungu Neon)</option>
+                    <option value="misteri">👁️ Kejadian Aneh (Misteri/Gelap)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>3. Teks Berita Utama</label>
+                <input type="text" id="text-input" placeholder="Contoh: DOMPET PRIA INI MENANGIS DI AKHIR BULAN" maxlength="65">
+            </div>
+
+            <button class="btn-download" id="download-btn">📥 Unduh Gambar</button>
+        </div>
+    </div>
+
+    <script>
+        // Data Konfigurasi 10 Tema Frame
+        const themes = {
+            breaking: { primary: '#cc0000', accent: '#ffcc00', text: '#ffffff', ribbon: 'BREAKING NEWS', source: 'KABAR UTAMA', live: '● LIVE' },
+            gosip:    { primary: '#ff007f', accent: '#ffffff', text: '#ffffff', ribbon: 'GOSIP HANGAT', source: 'CELEB SCOOP', live: '● HEBOH' },
+            kriminal: { primary: '#111111', accent: '#ffcc00', text: '#ffcc00', ribbon: 'TKP UTAMA', source: 'INFO KRIMINAL', live: '● SEGERA' },
+            sport:    { primary: '#1e7e34', accent: '#ffffff', text: '#ffffff', ribbon: 'KABAR ARENA', source: 'SPORT UPDATE', live: '● LIVE MATCH' },
+            tech:     { primary: '#0070f3', accent: '#00dfd8', text: '#ffffff', ribbon: 'TEKNO FLASH', source: 'CYBER NEWS', live: '● UPDATE' },
+            ekonomi:  { primary: '#0b3c5d', accent: '#328cc1', text: '#ffffff', ribbon: 'PASAR SAHAM', source: 'BUSINESS LATEST', live: '● KURS' },
+            politik:  { primary: '#4f5d75', accent: '#ef8354', text: '#ffffff', ribbon: 'KABAR DEWAN', source: 'POLITIK HARI INI', live: '● LIVE REPORT' },
+            cuaca:    { primary: '#e65c00', accent: '#f9d423', text: '#ffffff', ribbon: 'INFO CUACA', source: 'WEATHER ALERT', live: '● AKTUAL' },
+            gaming:   { primary: '#6f42c1', accent: '#e83e8c', text: '#ffffff', ribbon: 'ZONA GAMING', source: 'ESPORTS NEWS', live: '● STREAM' },
+            misteri:  { primary: '#2b0040', accent: '#adff2f', text: '#ffffff', ribbon: 'DUNIA LAIN', source: 'MISTERI FAKTA', live: '● HOROR' }
+        };
+
+        const fileInput = document.getElementById('file-input');
+        const userImg = document.getElementById('user-img');
+        const placeholder = document.getElementById('placeholder');
+        const themeSelect = document.getElementById('theme-select');
+        const textInput = document.getElementById('text-input');
+        
+        // Element Frame yang akan berubah secara dinamis
+        const root = document.documentElement;
+        const ribbonTitle = document.getElementById('ribbon-title');
+        const sourceTag = document.getElementById('source-tag');
+        const liveTag = document.getElementById('live-tag');
+        const headlineText = document.getElementById('headline-text');
+        const downloadBtn = document.getElementById('download-btn');
+
+        // 1. Logika Upload Gambar
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    userImg.src = event.target.result;
+                    userImg.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 2. Logika Penggantian Tema (10 Variasi)
+        themeSelect.addEventListener('change', function() {
+            const selectedTheme = themes[this.value];
+            
+            // Ganti warna CSS Variable
+            root.style.setProperty('--theme-color', selectedTheme.primary);
+            root.style.setProperty('--accent-color', selectedTheme.accent);
+            root.style.setProperty('--text-color', selectedTheme.text);
+            
+            // Ganti Teks Label bawaan tema
+            ribbonTitle.innerText = selectedTheme.ribbon;
+            sourceTag.innerText = selectedTheme.source;
+            liveTag.innerText = selectedTheme.live;
+        });
+
+        // 3. Logika Real-time Teks Headline
+        textInput.addEventListener('input', function() {
+            headlineText.innerText = this.value.trim() !== "" ? this.value : "Ketik teks berita Anda di kolom input!";
+        });
+
+        // 4. Logika Unduh Hasil Frame Menggunakan HTML2Canvas
+        downloadBtn.addEventListener('click', function() {
+            const frame = document.getElementById('frameToCapture');
+            
+            // Mengatasi masalah gambar blank jika user belum upload
+            if(userImg.style.display === 'none' || userImg.src === '#') {
+                alert('Silakan upload foto Anda terlebih dahulu!');
+                return;
+            }
+
+            downloadBtn.innerText = "Memproses...";
+            downloadBtn.disabled = true;
+
+            // Render DOM HTML menjadi Canvas Gambar
+            html2canvas(frame, {
+                useCORS: true, // mengizinkan resource external jika ada
+                allowTaint: true,
+                scale: 2 // Meningkatkan kualitas resolusi hasil download (HD)
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'berita-singkat-' + Date.now() + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                downloadBtn.innerText = "📥 Unduh Gambar";
+                downloadBtn.disabled = false;
+            }).catch(err => {
+                alert('Gagal mengunduh gambar.');
+                console.error(err);
+                downloadBtn.innerText = "📥 Unduh Gambar";
+                downloadBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
