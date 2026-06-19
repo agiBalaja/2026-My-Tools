@@ -137,7 +137,7 @@
             width: 500px;
             min-width: 500px;
             background-color: #fff;
-            border-radius: 12px;
+            border-radius: 0px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.15);
             overflow: hidden;
         }
@@ -162,10 +162,10 @@
             right: 25px;
             background-color: var(--danger-color);
             color: white;
-            padding: 6px 18px;
+            padding: 6px 10px;
             font-weight: 900;
             font-style: italic;
-            font-size: 22px;
+            font-size: 15px;
             border-radius: 6px;
             transform: rotate(-5deg);
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
@@ -189,9 +189,9 @@
         }
 
         .main-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 800;
-            line-height: 1.25;
+            line-height: 1;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
@@ -370,10 +370,25 @@
                 reader.onload = function(e) {
                     previewImg.src = e.target.result;
                     showToast("Gambar latar berhasil diunggah!", "📸");
+                    
+                    // MODIFIKASI: Menyesuaikan tinggi container berdasarkan rasio asli gambar
+                    previewImg.onload = function() {
+                        const imageContainer = document.querySelector('.image-container');
+                        const originalWidth = previewImg.naturalWidth;
+                        const originalHeight = previewImg.naturalHeight;
+                        
+                        // Hitung tinggi baru berdasarkan lebar container yang tetap (500px)
+                        const aspectRasio = originalHeight / originalWidth;
+                        const newHeight = 500 * aspectRasio;
+                        
+                        // Terapkan tinggi baru ke container gambar
+                        imageContainer.style.height = newHeight + 'px';
+                    };
                 }
                 reader.readAsDataURL(file);
             }
         });
+
 
         // Live Preview: Update Teks Secara Realtime saat pengguna mengetik
         titleInput1.addEventListener('input', () => { 
@@ -454,4 +469,4 @@
         }
     </script>
 </body>
-</html>
+                                                                                                                                                                                                                  </html>
