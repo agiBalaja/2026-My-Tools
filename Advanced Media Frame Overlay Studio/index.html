@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Advanced Media Frame Overlay Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Playfair+Display:ital,wght@0,700;1,700&family=Poppins:wght@400;700;800&family=Bebas+Neue&family=Caveat:wght@700&family=Lobster&family=Inter:wght@400;700;800&family=Oswald:wght@600&family=Pacifico&family=Roboto+Slab:wght@700&family=Open+Sans:wght@700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Playfair+Display:ital,wght@0,700;1,700&family=Poppins:wght@400;700;800&family=Bebas+Neue&family=Caveat:wght@700&family=Lobster&family=Inter:wght@400;700;800&family=Oswald:wght@600&family=Pacifico&family=Roboto+Slab:wght@700&family=Open+Sans:wght@700;800&display=swap" rel="stylesheet" />
+
     <style>
         :root {
             --bg-color: #121214;
             --panel-color: #1a1a24;
             --accent-color: #00adb5;
             --text-color: #eeeeee;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -55,7 +59,7 @@
             padding: 20px;
             border-radius: 12px;
             width: 380px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -69,13 +73,50 @@
             gap: 6px;
         }
 
+        /* ---- Compact font row ---- */
+        .control-group-inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group-inline label {
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 600;
+            color: #cbd5e1;
+            min-width: 112px;
+        }
+
+        .control-group-inline select {
+            flex: 1;
+            padding: 5px 8px;
+            font-size: 13px;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #fff;
+            font-family: inherit;
+            cursor: pointer;
+            min-width: 0;
+        }
+
+        .control-group-inline select option {
+            font-size: 13px;
+            padding: 4px 6px;
+        }
+
         label {
             font-size: 13px;
             font-weight: 600;
             color: #cbd5e1;
         }
 
-        input[type="text"], textarea, select, input[type="number"] {
+        input[type="text"],
+        textarea,
+        select,
+        input[type="number"] {
             width: 100%;
             padding: 10px;
             border-radius: 6px;
@@ -87,51 +128,23 @@
             font-size: 14px;
         }
 
+        /* ---- Compact dropdown untuk design style ---- */
+        select.compact-style-select {
+            padding: 8px 10px;
+            font-size: 14px;
+            height: 40px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #fff;
+            font-family: inherit;
+            cursor: pointer;
+            appearance: auto;
+        }
+
         textarea {
             resize: vertical;
             height: 70px;
-        }
-
-        .style-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            max-height: 220px;
-            overflow-y: auto;
-            border: 1px solid #334155;
-            padding: 8px;
-            border-radius: 6px;
-            background: #0f172a;
-        }
-
-        .style-option {
-            position: relative;
-        }
-
-        .style-option input[type="radio"] {
-            display: none;
-        }
-
-        .style-card {
-            border: 1px solid #475569;
-            padding: 10px 6px;
-            text-align: center;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            transition: 0.2s;
-            background: #1e293b;
-            color: #e2e8f0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .style-option input[type="radio"]:checked + .style-card {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            color: #000;
-            font-weight: bold;
         }
 
         .btn {
@@ -166,7 +179,7 @@
             background-color: #09090b;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -191,108 +204,88 @@
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
 
     <h1>Media Frame Studio</h1>
-    <p class="subtitle">Multi-Style Rekayasa Komparasi Gambar & Video Acuan Berita Nasional</p>
+    <p class="subtitle">Multi-Style Rekayasa Komparasi Gambar &amp; Video Acuan Berita Nasional</p>
 
     <div class="container">
         <div class="control-panel">
-            
+
+            <!-- 1. Sumber Media -->
             <div class="control-group">
                 <label>1. Sumber Media (Foto / Video)</label>
-                <input type="file" id="mediaInput" accept="image/*,video/*" class="btn" style="background:#334155; color:#fff; font-size:12px; padding:8px;">
+                <input type="file" id="mediaInput" accept="image/*,video/*" class="btn" style="background:#334155; color:#fff; font-size:12px; padding:8px;" />
             </div>
 
+            <!-- 2. Pilih Konstruksi Desain (DROPDOWN) -->
             <div class="control-group">
                 <label>2. Pilih Konstruksi Desain (11 Opsi Acuan)</label>
-                <div class="style-grid">
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style1" checked>
-                        <div class="style-card">Style 1</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style2">
-                        <div class="style-card">Style 2</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style3">
-                        <div class="style-card">Style 3</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style4">
-                        <div class="style-card">Style 4</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style5">
-                        <div class="style-card">Style 5</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style6">
-                        <div class="style-card">Style 6</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style7">
-                        <div class="style-card">Style 7</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style8">
-                        <div class="style-card">Style 8</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style9">
-                        <div class="style-card">Style 9</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style10">
-                        <div class="style-card">Style 10</div>
-                    </label>
-                    <label class="style-option">
-                        <input type="radio" name="designStyle" value="style11">
-                        <div class="style-card">Style 11</div>
-                    </label>
-                </div>
+                <select id="designStyleSelect" class="compact-style-select">
+                    <option value="style1">Style 1 — Blok Baris Terpisah</option>
+                    <option value="style2">Style 2 — Teal Gradient Banner</option>
+                    <option value="style3">Style 3 — Bubble Akun Sosial</option>
+                    <option value="style4">Style 4 — Tribun Network</option>
+                    <option value="style5">Style 5 — Siku Emas FISIP UNS</option>
+                    <option value="style6">Style 6 — KUDUS Kapsul Merah</option>
+                    <option value="style7">Style 7 — RESMI BERLAKU! Siku Merah</option>
+                    <option value="style8">Style 8 — Pancasila Oranye</option>
+                    <option value="style9">Style 9 — Tangerang Kuning</option>
+                    <option value="style10">Style 10 — Grafik Pola Kanan</option>
+                    <option value="style11">Style 11 — Akurat Co #VIRALIN</option>
+                </select>
             </div>
 
+            <!-- Header Group (dinamis) -->
             <div class="control-group" id="headerGroup" style="display:none;">
                 <label id="headerLabel">Label Atas / Kategori</label>
-                <input type="text" id="headerText" value="INFO NASIONAL">
+                <input type="text" id="headerText" value="INFO NASIONAL" />
             </div>
 
+            <!-- 3. Redaksi Teks Utama -->
             <div class="control-group">
                 <label>3. Redaksi Teks Utama</label>
                 <textarea id="mainText">Klik dan geser untuk menyesuaikan posisi.</textarea>
             </div>
 
+            <!-- 4. Dimensi Font Utama (px) -->
             <div class="control-group">
                 <label>4. Dimensi Font Utama (px)</label>
-                <input type="number" id="fontSize" value="32" min="10" max="120">
+                <input type="number" id="fontSize" value="32" min="10" max="120" />
             </div>
 
-            <div class="control-group">
-                <label>5. Tipografi Karakter (11 Pilihan Font)</label>
+            <!-- 5. Tipografi Karakter — INLINE (1 baris, kolom lebih pendek) -->
+            <div class="control-group-inline">
+                <label>5. Tipografi Karakter</label>
                 <select id="fontFamily">
-                    <option value="Montserrat" style="font-family:'Montserrat'; font-weight:700;">Montserrat (Bold Headline)</option>
-                    <option value="Poppins" style="font-family:'Poppins'; font-weight:700;" selected>Poppins (Clean Corporate)</option>
-                    <option value="Inter" style="font-family:'Inter'; font-weight:800;">Inter (Premium News)</option>
-                    <option value="Bebas Neue" style="font-family:'Bebas Neue';">Bebas Neue (Asimetris / Impact)</option>
-                    <option value="Oswald" style="font-family:'Oswald';">Oswald (Condensed)</option>
-                    <option value="Open Sans" style="font-family:'Open Sans'; font-weight:800;">Open Sans (Bold Media)</option>
-                    <option value="Roboto Slab" style="font-family:'Roboto Slab';">Roboto Slab (Slab Serif)</option>
-                    <option value="Playfair Display" style="font-family:'Playfair Display'; font-weight:700;">Playfair Display (Elegant)</option>
-                    <option value="Lobster" style="font-family:'Lobster';">Lobster (Script Gaya)</option>
-                    <option value="Pacifico" style="font-family:'Pacifico';">Pacifico (Retro Vintage)</option>
-                    <option value="Caveat" style="font-family:'Caveat';">Caveat (Handwritten)</option>
+                    <option value="Montserrat" style="font-family:'Montserrat'; font-weight:700;">Montserrat</option>
+                    <option value="Poppins" style="font-family:'Poppins'; font-weight:700;" selected>Poppins</option>
+                    <option value="Inter" style="font-family:'Inter'; font-weight:800;">Inter</option>
+                    <option value="Bebas Neue" style="font-family:'Bebas Neue';">Bebas Neue</option>
+                    <option value="Oswald" style="font-family:'Oswald';">Oswald</option>
+                    <option value="Open Sans" style="font-family:'Open Sans'; font-weight:800;">Open Sans</option>
+                    <option value="Roboto Slab" style="font-family:'Roboto Slab';">Roboto Slab</option>
+                    <option value="Playfair Display" style="font-family:'Playfair Display'; font-weight:700;">Playfair Display</option>
+                    <option value="Lobster" style="font-family:'Lobster';">Lobster</option>
+                    <option value="Pacifico" style="font-family:'Pacifico';">Pacifico</option>
+                    <option value="Caveat" style="font-family:'Caveat';">Caveat</option>
                 </select>
             </div>
 
             <div class="tip-box">
-                👉 <b>Fitur Seret Posisi:</b> Arahkan mouse atau sentuh layar canvas lalu <b>tahan & geser</b> untuk memindahkan letak komponen secara fleksibel!
+                👉 <b>Fitur Seret Posisi:</b> Arahkan mouse atau sentuh layar canvas lalu <b>tahan &amp; geser</b> untuk memindahkan letak komponen secara fleksibel!
             </div>
 
             <button class="btn btn-download" id="downloadBtn">Download Hasil Generate</button>
@@ -304,19 +297,12 @@
     </div>
 
     <script>
+        // ============================================================
+        //  DOM REFERENCES
+        // ============================================================
         const canvas = document.getElementById('studioCanvas');
         const ctx = canvas.getContext('2d');
 
-        // State Kontrol Aplikasi
-        let uploadedMedia = null;
-        let mediaType = 'image';
-        let isDragging = false;
-        
-        // Letak Koordinat Awal Komponen Overlay
-        let textPos = { x: 50, y: 180 };
-        let dragOffset = { x: 0, y: 0 };
-
-        // Variabel DOM UI
         const mediaInput = document.getElementById('mediaInput');
         const mainTextEl = document.getElementById('mainText');
         const fontSizeEl = document.getElementById('fontSize');
@@ -325,30 +311,66 @@
         const headerTextEl = document.getElementById('headerText');
         const headerLabel = document.getElementById('headerLabel');
         const downloadBtn = document.getElementById('downloadBtn');
-        const styleRadios = document.querySelectorAll('input[name="designStyle"]');
+        const designStyleSelect = document.getElementById('designStyleSelect');
 
-        // Default Canvas Placeholder jika media belum dimasukkan
+        // ============================================================
+        //  STATE
+        // ============================================================
+        let uploadedMedia = null;
+        let mediaType = 'image';
+        let isDragging = false;
+        let textPos = { x: 50, y: 180 };
+        let dragOffset = { x: 0, y: 0 };
+
+        // ============================================================
+        //  HELPER: roundRect polyfill untuk Canvas
+        // ============================================================
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
+                const r = Array.isArray(radii) ? radii : [radii, radii, radii, radii];
+                const [tl, tr, br, bl] = r.map(v => Math.min(v || 0, Math.min(w, h) / 2));
+                this.moveTo(x + tl, y);
+                this.lineTo(x + w - tr, y);
+                this.quadraticCurveTo(x + w, y, x + w, y + tr);
+                this.lineTo(x + w, y + h - br);
+                this.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
+                this.lineTo(x + bl, y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - bl);
+                this.lineTo(x, y + tl);
+                this.quadraticCurveTo(x, y, x + tl, y);
+                this.closePath();
+                return this;
+            };
+        }
+
+        // ============================================================
+        //  DEFAULT PLACEHOLDER
+        // ============================================================
         const initImg = new Image();
-        initImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="840" height="470" viewBox="0 0 840 470"><rect width="840" height="470" fill="%23222" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23777" font-family="sans-serif" font-size="18">Silakan upload foto atau video latar belakang Anda</text></svg>';
+        initImg.src =
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="840" height="470" viewBox="0 0 840 470"><rect width="840" height="470" fill="%23222" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23777" font-family="sans-serif" font-size="18">Silakan upload foto atau video latar belakang Anda</text></svg>';
         initImg.onload = () => {
             uploadedMedia = initImg;
             drawEverything();
         };
 
-        // File Handler Input Media (Mendukung Foto & Video)
+        // ============================================================
+        //  MEDIA INPUT HANDLER
+        // ============================================================
         mediaInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             const fileURL = URL.createObjectURL(file);
-            
+
             if (file.type.startsWith('image/')) {
                 mediaType = 'image';
                 const img = new Image();
                 img.src = fileURL;
                 img.onload = function() {
                     uploadedMedia = img;
-                    canvas.width = img.width > 1200 ? 1200 : (img.width < 700 ? 700 : img.width);
-                    canvas.height = (canvas.width / img.width) * img.height;
+                    const w = img.width > 1200 ? 1200 : (img.width < 700 ? 700 : img.width);
+                    canvas.width = w;
+                    canvas.height = (w / img.width) * img.height;
                     resetTextPosition();
                     drawEverything();
                 };
@@ -362,8 +384,9 @@
                 video.playsInline = true;
                 video.onloadedmetadata = function() {
                     uploadedMedia = video;
-                    canvas.width = video.videoWidth > 1200 ? 1200 : (video.videoWidth < 700 ? 700 : video.videoWidth);
-                    canvas.height = (canvas.width / video.videoWidth) * video.videoHeight;
+                    const w = video.videoWidth > 1200 ? 1200 : (video.videoWidth < 700 ? 700 : video.videoWidth);
+                    canvas.width = w;
+                    canvas.height = (w / video.videoWidth) * video.videoHeight;
                     resetTextPosition();
                     video.play();
                     requestAnimationFrame(renderVideoLoop);
@@ -383,44 +406,71 @@
             }
         }
 
-        // Live Event Listeners untuk Refresh Hasil Render sewaktu data diubah
+        // ============================================================
+        //  LIVE EVENT LISTENERS (refresh otomatis)
+        // ============================================================
         mainTextEl.addEventListener('input', drawEverything);
         fontSizeEl.addEventListener('input', drawEverything);
         fontFamilyEl.addEventListener('change', drawEverything);
         headerTextEl.addEventListener('input', drawEverything);
 
-        // Pengaturan dinamis input pembantu bergantung tipe style yang dipilih
-        styleRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const style = this.value;
-                headerGroup.style.display = 'flex';
-                
-                if (style === 'style1') { headerGroup.style.display = 'none'; }
-                else if (style === 'style2') { headerLabel.innerText = "Tag (#faktabaru)"; headerTextEl.value = "#faktabaru"; }
-                else if (style === 'style3') { headerLabel.innerText = "Akun Username"; headerTextEl.value = "shirahnabi"; }
-                else if (style === 'style4') { headerLabel.innerText = "Teks Logo (Tribun Network)"; headerTextEl.value = "TribunNetwork"; }
-                else if (style === 'style5') { headerGroup.style.display = 'none'; } // Siku Emas murni teks
-                else if (style === 'style6') { headerLabel.innerText = "Kapsul Atas (KUDUS)"; headerTextEl.value = "KUDUS"; }
-                else if (style === 'style7') { headerLabel.innerText = "Kapsul Atas (RESMI BERLAKU!)"; headerTextEl.value = "RESMI BERLAKU!"; }
-                else if (style === 'style8') { headerLabel.innerText = "Kapsul Atas (Kategori)"; headerTextEl.value = "Pidato di Hari Pancasila"; }
-                else if (style === 'style9') { headerLabel.innerText = "Kapsul Atas (Kategori)"; headerTextEl.value = "Media Tangerang Raya"; }
-                else if (style === 'style10') { headerGroup.style.display = 'none'; } // Grafik Pola Kanan murni kode
-                else if (style === 'style11') { headerLabel.innerText = "Label Biru Atas"; headerTextEl.value = "#VIRALIN"; }
-                
-                resetTextPosition();
-                drawEverything();
-            });
+        // ============================================================
+        //  DESIGN STYLE DROPDOWN → update headerGroup & redraw
+        // ============================================================
+        function applyStylePreset(style) {
+            headerGroup.style.display = 'flex';
+            if (style === 'style1') {
+                headerGroup.style.display = 'none';
+            } else if (style === 'style2') {
+                headerLabel.innerText = 'Tag (#faktabaru)';
+                headerTextEl.value = '#faktabaru';
+            } else if (style === 'style3') {
+                headerLabel.innerText = 'Akun Username';
+                headerTextEl.value = 'shirahnabi';
+            } else if (style === 'style4') {
+                headerLabel.innerText = 'Teks Logo (Tribun Network)';
+                headerTextEl.value = 'TribunNetwork';
+            } else if (style === 'style5') {
+                headerGroup.style.display = 'none';
+            } else if (style === 'style6') {
+                headerLabel.innerText = 'Kapsul Atas (KUDUS)';
+                headerTextEl.value = 'KUDUS';
+            } else if (style === 'style7') {
+                headerLabel.innerText = 'Kapsul Atas (RESMI BERLAKU!)';
+                headerTextEl.value = 'RESMI BERLAKU!';
+            } else if (style === 'style8') {
+                headerLabel.innerText = 'Kapsul Atas (Kategori)';
+                headerTextEl.value = 'Pidato di Hari Pancasila';
+            } else if (style === 'style9') {
+                headerLabel.innerText = 'Kapsul Atas (Kategori)';
+                headerTextEl.value = 'Media Tangerang Raya';
+            } else if (style === 'style10') {
+                headerGroup.style.display = 'none';
+            } else if (style === 'style11') {
+                headerLabel.innerText = 'Label Biru Atas';
+                headerTextEl.value = '#VIRALIN';
+            }
+            resetTextPosition();
+            drawEverything();
+        }
+
+        designStyleSelect.addEventListener('change', function() {
+            applyStylePreset(this.value);
         });
 
-        // INTI ENGINE DRAWING CANVAS OVERLAY MULTI-STYLE ACCURATE
+        // Terapkan preset awal (style1)
+        applyStylePreset('style1');
+
+        // ============================================================
+        //  INTI ENGINE DRAWING — semua style dipertahankan persis
+        // ============================================================
         function drawEverything() {
             if (!uploadedMedia) return;
 
-            // Bersihkan Canvas & Gambar Background Media Utama
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(uploadedMedia, 0, 0, canvas.width, canvas.height);
 
-            const activeStyle = document.querySelector('input[name="designStyle"]:checked').value;
+            const activeStyle = designStyleSelect.value;
             const text = mainTextEl.value;
             const fontSize = parseInt(fontSizeEl.value) || 28;
             const fontFamily = fontFamilyEl.value;
@@ -428,40 +478,42 @@
 
             ctx.save();
 
-            // ==========================================
-            // STYLE 1: Blok Baris Terpisah (1000309932)
-            // ==========================================
+            // ==========================================================
+            // STYLE 1 — Blok Baris Terpisah (1000309932)
+            // ==========================================================
             if (activeStyle === 'style1') {
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
                 ctx.textBaseline = 'top';
                 let currentY = textPos.y;
-                const pX = 16, pY = 8, spacing = fontSize * 0.4;
-                
+                const pX = 16,
+                    pY = 8,
+                    spacing = fontSize * 0.4;
+
                 let totalH = 0;
-                lines.forEach((l, i) => totalH += (fontSize + pY*2) + (i < lines.length - 1 ? spacing : 0));
+                lines.forEach((l, i) => totalH += (fontSize + pY * 2) + (i < lines.length - 1 ? spacing : 0));
 
-                ctx.fillStyle = "#ffffff";
+                ctx.fillStyle = '#ffffff';
                 ctx.fillRect(textPos.x - 25, currentY - 15, 6, totalH + 15);
-                ctx.font = `bold ${fontSize * 1.6}px "${fontFamily}"`;
-                ctx.fillText("“", textPos.x - 36, currentY - 45);
+                ctx.font = 'bold ' + (fontSize * 1.6) + 'px "' + fontFamily + '"';
+                ctx.fillText('“', textPos.x - 36, currentY - 45);
 
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
                 lines.forEach(line => {
-                    if(!line.trim()) return;
+                    if (!line.trim()) return;
                     const w = ctx.measureText(line).width;
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(textPos.x, currentY, w + pX*2, fontSize + pY*2);
+                    ctx.fillRect(textPos.x, currentY, w + pX * 2, fontSize + pY * 2);
                     ctx.fillStyle = '#000000';
                     ctx.fillText(line, textPos.x + pX, currentY + pY);
-                    currentY += fontSize + pY*2 + spacing;
+                    currentY += fontSize + pY * 2 + spacing;
                 });
             }
 
-            // ==========================================
-            // STYLE 2: Teal Gradient Banner (1000309877)
-            // ==========================================
+            // ==========================================================
+            // STYLE 2 — Teal Gradient Banner (1000309877)
+            // ==========================================================
             else if (activeStyle === 'style2') {
-                const bH = canvas.height * 0.4;
+                const bH = canvas.height * 0.3;
                 const bY = canvas.height - bH;
                 const grad = ctx.createLinearGradient(0, bY, canvas.width, canvas.height);
                 grad.addColorStop(0, '#028090');
@@ -472,89 +524,108 @@
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, bY, 14, bH);
 
-                // Tab Tag Kanan Atas Melengkung
-                const tag = headerTextEl.value || "#faktabaru";
-                ctx.font = `bold ${fontSize * 0.7}px "${fontFamily}"`;
+                const tag = headerTextEl.value || '#faktabaru';
+                ctx.font = 'bold ' + (fontSize * 0.7) + 'px "' + fontFamily + '"';
                 const tW = ctx.measureText(tag).width + 50;
                 const tH = 45;
                 const tX = canvas.width - tW - 20;
                 const tY = bY - 18;
 
                 ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.roundRect(tX, tY, tW, tH, [15, 15, 0, 0]); ctx.fill();
+                ctx.beginPath();
+                ctx.roundRect(tX, tY, tW, tH, [15, 15, 0, 0]);
+                ctx.fill();
                 ctx.fillStyle = '#005b66';
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(tag, tX + tW/2, tY + tH/2);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(tag, tX + tW / 2, tY + tH / 2);
 
-                // Teks Utama Di Dalam Banner
-                ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
                 ctx.fillStyle = '#ffffff';
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
                 let curY = textPos.y < bY + 20 ? bY + 35 : textPos.y;
-                lines.forEach(l => { ctx.fillText(l, textPos.x, curY); curY += fontSize * 1.35; });
+                lines.forEach(l => { ctx.fillText(l, textPos.x, curY);
+                    curY += fontSize * 1.35; });
             }
 
-            // ==========================================
-            // STYLE 3: Bubble Akun Sosial (1000309875)
-            // ==========================================
+            // ==========================================================
+            // STYLE 3 — Bubble Akun Sosial (1000309875)
+            // ==========================================================
             else if (activeStyle === 'style3') {
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
                 let maxW = 0;
-                lines.forEach(l => { const w = ctx.measureText(l).width; if(w > maxW) maxW = w; });
-                const pX = 40, pY = 35;
-                const bW = maxW + pX * 2, bH = (lines.length * fontSize * 1.35) + pY * 2;
+                lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
+                const pX = 40,
+                    pY = 35;
+                const bW = maxW + pX * 2,
+                    bH = (lines.length * fontSize * 1.35) + pY * 2;
 
-                // Shadow Siku Tebal Hitam Luar
                 ctx.fillStyle = '#000000';
-                ctx.beginPath(); ctx.roundRect(textPos.x + 8, textPos.y + 8, bW, bH, 20); ctx.fill();
-
-                // Balon Utama Putih
-                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#000000'; ctx.lineWidth = 4;
-                ctx.beginPath(); ctx.roundRect(textPos.x, textPos.y, bW, bH, 20); ctx.fill(); ctx.stroke();
-
-                // Username Pill Badge
-                const user = headerTextEl.value || "username";
-                ctx.font = `bold ${fontSize * 0.55}px "${fontFamily}"`;
-                const uW = ctx.measureText(user).width + 55, uH = 34;
-                const uX = textPos.x + bW/2 - uW/2, uY = textPos.y - uH/2;
+                ctx.beginPath();
+                ctx.roundRect(textPos.x + 8, textPos.y + 8, bW, bH, 20);
+                ctx.fill();
 
                 ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.roundRect(uX, uY, uW, uH, 17); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#000000'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-                ctx.fillText(user, uX + 15, uY + uH/2);
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.roundRect(textPos.x, textPos.y, bW, bH, 20);
+                ctx.fill();
+                ctx.stroke();
 
-                // Centang Biru Tiruan
-                const cX = uX + uW - 20, cY = uY + uH/2;
-                ctx.fillStyle = '#1da1f2'; ctx.beginPath(); ctx.arc(cX, cY, 8, 0, 2*Math.PI); ctx.fill();
-                ctx.fillStyle = '#ffffff'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText('✓', cX, cY+2);
+                const user = headerTextEl.value || 'username';
+                ctx.font = 'bold ' + (fontSize * 0.55) + 'px "' + fontFamily + '"';
+                const uW = ctx.measureText(user).width + 55,
+                    uH = 34;
+                const uX = textPos.x + bW / 2 - uW / 2,
+                    uY = textPos.y - uH / 2;
 
-                // Output Isi Teks
-                ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.roundRect(uX, uY, uW, uH, 17);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(user, uX + 15, uY + uH / 2);
+
+                const cX = uX + uW - 20,
+                    cY = uY + uH / 2;
+                ctx.fillStyle = '#1da1f2';
+                ctx.beginPath();
+                ctx.arc(cX, cY, 8, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('✓', cX, cY + 2);
+
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
                 ctx.fillStyle = '#000000';
                 let curY = textPos.y + pY;
-                lines.forEach(l => { ctx.fillText(l, textPos.x + bW/2, curY); curY += fontSize * 1.35; });
+                lines.forEach(l => { ctx.fillText(l, textPos.x + bW / 2, curY);
+                    curY += fontSize * 1.35; });
             }
 
-            // ==========================================
-            // STYLE 4: Tribun Network Layout (1000309989)
-            // ==========================================
+            // ==========================================================
+            // STYLE 4 — Tribun Network Layout (1000309989)
+            // ==========================================================
             else if (activeStyle === 'style4') {
-                const bH = canvas.height * 0.31;
+                const bH = canvas.height * 0.25;
                 const bY = canvas.height - bH;
-                
-                // Banner Biru Utama dengan lengkungan kiri bawah khas media
+
                 ctx.fillStyle = '#0066cc';
                 ctx.beginPath();
                 ctx.roundRect(15, bY, canvas.width - 30, bH - 15, [0, 0, 0, 25]);
                 ctx.fill();
 
-                // Pembatas Putih Belakang Banner
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, bY, 15, bH);
 
-                // Bar Judul Putih Atas (Trapesium Khas Tribun)
                 ctx.fillStyle = '#f1f5f9';
                 ctx.beginPath();
                 ctx.moveTo(15, bY - 35);
@@ -563,240 +634,278 @@
                 ctx.lineTo(15, bY);
                 ctx.fill();
 
-                // Logo Mini Box Tribun Kiri Atas
                 ctx.fillStyle = '#ffffff';
                 ctx.strokeStyle = '#0066cc';
                 ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.roundRect(35, bY - 48, 140, 32, 4); ctx.fill(); ctx.stroke();
-                
+                ctx.beginPath();
+                ctx.roundRect(35, bY - 48, 140, 32, 4);
+                ctx.fill();
+                ctx.stroke();
+
                 ctx.fillStyle = '#0066cc';
                 ctx.font = 'italic bold 14px "Playfair Display"';
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(headerTextEl.value || "TribunNetwork", 105, bY - 32);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(headerTextEl.value || 'TribunNetwork', 105, bY - 32);
 
-                // Teks Berita Putih di Tengah
-                ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
                 ctx.fillStyle = '#ffffff';
                 let curY = textPos.y < bY ? bY + 30 : textPos.y;
-                lines.forEach(l => { ctx.fillText(l, canvas.width/2, curY); curY += fontSize * 1.4; });
+                lines.forEach(l => { ctx.fillText(l, canvas.width / 2, curY);
+                    curY += fontSize * 1.4; });
             }
 
-            // ==========================================
-            // STYLE 5: FISIP UNS Siku Emas (1000309987)
-            // ==========================================
+            // ==========================================================
+            // STYLE 5 — FISIP UNS Siku Emas (1000309987)
+            // ==========================================================
             else if (activeStyle === 'style5') {
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
                 let maxW = 0;
-                lines.forEach(l => { const w = ctx.measureText(l).width; if(w > maxW) maxW = w; });
-                const bW = maxW + 70, bH = (lines.length * fontSize * 1.4) + 50;
+                lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
+                const bW = maxW + 70,
+                    bH = (lines.length * fontSize * 1.4) + 50;
 
-                // Siku Oranye/Emas Kiri Belakang
                 ctx.fillStyle = '#eab308';
                 ctx.fillRect(textPos.x - 20, textPos.y - 20, 160, bH + 20);
 
-                // Box Putih Utama
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(textPos.x, textPos.y, bW, bH);
 
-                // Teks Berita Hitam Rata Tengah
-                ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
                 ctx.fillStyle = '#000000';
                 let curY = textPos.y + 25;
-                lines.forEach(l => { ctx.fillText(l, textPos.x + bW/2, curY); curY += fontSize * 1.4; });
+                lines.forEach(l => { ctx.fillText(l, textPos.x + bW / 2, curY);
+                    curY += fontSize * 1.4; });
             }
 
-            // ==========================================
-            // STYLE 6: KUDUS Kapsul Merah (1000309985)
-            // ==========================================
+            // ==========================================================
+            // STYLE 6 — KUDUS Kapsul Merah (1000309985)
+            // ==========================================================
             else if (activeStyle === 'style6') {
-                // Efek Shadow/Vignette Hitam Transparan di area bawah
                 const vG = ctx.createLinearGradient(0, canvas.height * 0.4, 0, canvas.height);
                 vG.addColorStop(0, 'rgba(0,0,0,0)');
-                vG.addColorStop(1, 'rgba(0,40,120,0.85)'); // Gradasi Biru Gelap sesuai gambar
+                vG.addColorStop(1, 'rgba(0,40,120,0.85)');
                 ctx.fillStyle = vG;
                 ctx.fillRect(0, canvas.height * 0.3, canvas.width, canvas.height * 0.7);
 
-                // Kapsul Label Merah Kategori atas
-                const labelTxt = headerTextEl.value || "KUDUS";
-                ctx.font = `bold ${fontSize * 0.65}px "${fontFamily}"`;
-                const lW = ctx.measureText(labelTxt).width + 50, lH = 34;
-                
-                ctx.fillStyle = '#dc2626'; // Merah solid
-                ctx.beginPath(); ctx.roundRect(textPos.x, textPos.y - 45, lW, lH, 17); ctx.fill();
-                ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(labelTxt, textPos.x + lW/2, textPos.y - 45 + lH/2);
+                const labelTxt = headerTextEl.value || 'KUDUS';
+                ctx.font = 'bold ' + (fontSize * 0.65) + 'px "' + fontFamily + '"';
+                const lW = ctx.measureText(labelTxt).width + 50,
+                    lH = 34;
 
-                // Teks Putih Solid Rata Kiri Khas Headline Berita Kriminal
-                ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
+                ctx.fillStyle = '#dc2626';
+                ctx.beginPath();
+                ctx.roundRect(textPos.x, textPos.y - 45, lW, lH, 17);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(labelTxt, textPos.x + lW / 2, textPos.y - 45 + lH / 2);
+
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
                 ctx.fillStyle = '#ffffff';
                 let curY = textPos.y;
-                lines.forEach(l => { ctx.fillText(l, textPos.x, curY); curY += fontSize * 1.35; });
+                lines.forEach(l => { ctx.fillText(l, textPos.x, curY);
+                    curY += fontSize * 1.35; });
             }
 
-            // ==========================================
-            // STYLE 7: RESMI BERLAKU Merah Siku (1000309983)
-            // ==========================================
+            // ==========================================================
+            // STYLE 7 — RESMI BERLAKU Merah Siku (1000309983)
+            // ==========================================================
             else if (activeStyle === 'style7') {
-                // Shadow Vignette Biru Gelap bawah
-                const bGrad = ctx.createLinearGradient(0, canvas.height*0.5, 0, canvas.height);
-                bGrad.addColorStop(0, 'rgba(0,0,0,0)'); bGrad.addColorStop(1, 'rgba(10,40,90,0.9)');
-                ctx.fillStyle = bGrad; ctx.fillRect(0,0,canvas.width,canvas.height);
+                const bGrad = ctx.createLinearGradient(0, canvas.height * 0.5, 0, canvas.height);
+                bGrad.addColorStop(0, 'rgba(0,0,0,0)');
+                bGrad.addColorStop(1, 'rgba(10,40,90,0.9)');
+                ctx.fillStyle = bGrad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                let maxW = 0; lines.forEach(l => { const w = ctx.measureText(l).width; if(w > maxW) maxW = w; });
-                const bW = maxW + 60, bH = (lines.length * fontSize * 1.35) + 40;
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                let maxW = 0;
+                lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
+                const bW = maxW + 60,
+                    bH = (lines.length * fontSize * 1.35) + 40;
 
-                // Label Merah Nempel Atas Box
-                const rText = headerTextEl.value || "RESMI BERLAKU!";
-                ctx.font = `bold ${fontSize * 0.6}px "${fontFamily}"`;
-                const rW = ctx.measureText(rText).width + 30, rH = 32;
+                const rText = headerTextEl.value || 'RESMI BERLAKU!';
+                ctx.font = 'bold ' + (fontSize * 0.6) + 'px "' + fontFamily + '"';
+                const rW = ctx.measureText(rText).width + 30,
+                    rH = 32;
                 ctx.fillStyle = '#b91c1c';
                 ctx.fillRect(textPos.x, textPos.y - rH, rW, rH);
-                ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(rText, textPos.x + rW/2, textPos.y - rH/2);
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(rText, textPos.x + rW / 2, textPos.y - rH / 2);
 
-                // Putih Box Utama Berita
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(textPos.x, textPos.y, bW, bH);
 
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                ctx.fillStyle = '#000000'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
                 let curY = textPos.y + 20;
-                lines.forEach(l => { ctx.fillText(l, textPos.x + 30, curY); curY += fontSize * 1.35; });
+                lines.forEach(l => { ctx.fillText(l, textPos.x + 30, curY);
+                    curY += fontSize * 1.35; });
             }
 
-            // ==========================================
-            // STYLE 8: Pancasila Oranye (1000309981)
-            // ==========================================
+            // ==========================================================
+            // STYLE 8 — Pancasila Oranye (1000309981)
+            // ==========================================================
             else if (activeStyle === 'style8') {
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                let maxW = 0; lines.forEach(l => { const w = ctx.measureText(l).width; if(w > maxW) maxW = w; });
-                const bW = maxW + 60, bH = (lines.length * fontSize * 1.35) + 45;
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                let maxW = 0;
+                lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
+                const bW = maxW + 60,
+                    bH = (lines.length * fontSize * 1.35) + 45;
 
-                // Label Oranye Khas Atas Box
-                const pText = headerTextEl.value || "Pidato di Hari Pancasila";
-                ctx.font = `bold ${fontSize * 0.6}px "${fontFamily}"`;
-                const pW = ctx.measureText(pText).width + 30, pH = 35;
+                const pText = headerTextEl.value || 'Pidato di Hari Pancasila';
+                ctx.font = 'bold ' + (fontSize * 0.6) + 'px "' + fontFamily + '"';
+                const pW = ctx.measureText(pText).width + 30,
+                    pH = 35;
                 ctx.fillStyle = '#ea580c';
                 ctx.fillRect(textPos.x, textPos.y - pH, pW, pH);
-                ctx.fillStyle = '#000000'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(pText, textPos.x + pW/2, textPos.y - pH/2);
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(pText, textPos.x + pW / 2, textPos.y - pH / 2);
 
-                // Box Putih
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(textPos.x, textPos.y, bW, bH);
 
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                ctx.fillStyle = '#000000'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
                 let curY = textPos.y + 22;
-                lines.forEach(l => { ctx.fillText(l, textPos.x + bW/2, curY); curY += fontSize * 1.35; });
+                lines.forEach(l => { ctx.fillText(l, textPos.x + bW / 2, curY);
+                    curY += fontSize * 1.35; });
             }
 
-            // ==========================================
-            // STYLE 9: Tangerang Kuning (1000309979)
-            // ==========================================
+            // ==========================================================
+            // STYLE 9 — Tangerang Kuning (1000309979)
+            // ==========================================================
             else if (activeStyle === 'style9') {
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                let maxW = 0; lines.forEach(l => { const w = ctx.measureText(l).width; if(w > maxW) maxW = w; });
-                const bW = maxW + 60, bH = (lines.length * fontSize * 1.35) + 40;
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                let maxW = 0;
+                lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
+                const bW = maxW + 60,
+                    bH = (lines.length * fontSize * 1.35) + 40;
 
-                // Label Kuning Terang Atas
-                const tText = headerTextEl.value || "Media Tangerang Raya";
-                ctx.font = `bold ${fontSize * 0.55}px "${fontFamily}"`;
-                const tW = ctx.measureText(tText).width + 35, tH = 34;
+                const tText = headerTextEl.value || 'Media Tangerang Raya';
+                ctx.font = 'bold ' + (fontSize * 0.55) + 'px "' + fontFamily + '"';
+                const tW = ctx.measureText(tText).width + 35,
+                    tH = 34;
                 ctx.fillStyle = '#eab308';
                 ctx.fillRect(textPos.x, textPos.y - tH, tW, tH);
-                ctx.fillStyle = '#000000'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(tText, textPos.x + tW/2, textPos.y - tH/2);
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(tText, textPos.x + tW / 2, textPos.y - tH / 2);
 
-                // Box Putih Media Utama
                 ctx.fillStyle = '#f8fafc';
                 ctx.fillRect(textPos.x, textPos.y, bW, bH);
 
-                // Teks Rata Kiri Campuran Bold-Regular Khas Liputan Tangerang
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                ctx.fillStyle = '#000000'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
                 let curY = textPos.y + 20;
-                lines.forEach(l => { ctx.fillText(l, textPos.x + 30, curY); curY += fontSize * 1.35; });
+                lines.forEach(l => { ctx.fillText(l, textPos.x + 30, curY);
+                    curY += fontSize * 1.35; });
             }
 
-            // ==========================================
-            // STYLE 10: Klinik Gigi Berpola Grafik (1000309972)
-            // ==========================================
+            // ==========================================================
+            // STYLE 10 — Klinik Gigi Berpola Grafik (1000309972)
+            // ==========================================================
             else if (activeStyle === 'style10') {
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                let maxW = 0; lines.forEach(l => { const w = ctx.measureText(l).width; if(w > maxW) maxW = w; });
-                const bW = Math.max(maxW + 160, 450), bH = Math.max((lines.length * fontSize * 1.4) + 60, 180);
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                let maxW = 0;
+                lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
+                const bW = Math.max(maxW + 160, 450),
+                    bH = Math.max((lines.length * fontSize * 1.4) + 60, 180);
 
-                // Frame Belakang Blur/Bayangan Biru
                 ctx.fillStyle = '#1e3a8a';
-                ctx.beginPath(); ctx.roundRect(textPos.x - 4, textPos.y - 4, bW + 8, bH + 8, 16); ctx.fill();
+                ctx.beginPath();
+                ctx.roundRect(textPos.x - 4, textPos.y - 4, bW + 8, bH + 8, 16);
+                ctx.fill();
 
-                // Box Utama Biru Muda Pucat Berwarna Dingin Khas Kedokteran
                 ctx.fillStyle = '#e0f2fe';
-                ctx.beginPath(); ctx.roundRect(textPos.x, textPos.y, bW, bH, 14); ctx.fill();
+                ctx.beginPath();
+                ctx.roundRect(textPos.x, textPos.y, bW, bH, 14);
+                ctx.fill();
 
-                // Menggambar Pola Geometris Ikonik Sisi Kanan Box (Segitiga, Kotak, Silang Biru Toska)
                 ctx.fillStyle = '#7dd3fc';
                 const pX = textPos.x + bW - 70;
                 const pY = textPos.y + 30;
-                // Menggambar elemen grafis tiruan
                 ctx.fillRect(pX, pY, 15, 15);
                 ctx.fillRect(pX + 25, pY + 25, 15, 15);
-                ctx.beginPath(); ctx.arc(pX + 10, pY + 50, 8, 0, 2*Math.PI); ctx.fill();
+                ctx.beginPath();
+                ctx.arc(pX + 10, pY + 50, 8, 0, 2 * Math.PI);
+                ctx.fill();
 
-                // Teks Berita Biru Tua Elegan
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                ctx.fillStyle = '#0369a1'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                ctx.fillStyle = '#0369a1';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
                 let curY = textPos.y + 30;
-                lines.forEach(l => { ctx.fillText(l, textPos.x + 40, curY); curY += fontSize * 1.4; });
+                lines.forEach(l => { ctx.fillText(l, textPos.x + 40, curY);
+                    curY += fontSize * 1.4; });
             }
 
-            // ==========================================
-            // STYLE 11: Akurat Co #VIRALIN (1000309957)
-            // ==========================================
+            // ==========================================================
+            // STYLE 11 — Akurat Co #VIRALIN (1000309957)
+            // ==========================================================
             else if (activeStyle === 'style11') {
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                let maxW = 0; lines.forEach(l => { const w = ctx.measureText(l).width; if(w > maxW) maxW = w; });
-                const bW = maxW + 60, bH = (lines.length * fontSize * 1.4) + 60;
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                let maxW = 0;
+                lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
+                const bW = maxW + 60,
+                    bH = (lines.length * fontSize * 1.4) + 60;
 
-                // Box Dasar Hitam Belakang (Miring Tipis Khas Akurat)
                 ctx.fillStyle = '#000000';
                 ctx.fillRect(textPos.x - 8, textPos.y + 10, bW + 16, bH);
 
-                // Spanduk Kuning Pekat Utama
                 ctx.fillStyle = '#ca8a04';
                 ctx.fillRect(textPos.x, textPos.y, bW, bH);
 
-                // Badge Tag #VIRALIN Biru Atas
-                const vTxt = headerTextEl.value || "#VIRALIN";
-                ctx.font = `italic bold ${fontSize * 0.75}px "Montserrat"`;
-                const vW = ctx.measureText(vTxt).width + 60, vH = 42;
-                ctx.fillStyle = '#0b579c'; // Biru Tua Akurat
-                ctx.fillRect(textPos.x + bW/2 - vW/2, textPos.y - vH + 10, vW, vH);
-                
-                ctx.fillStyle = '#facc15'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(vTxt, textPos.x + bW/2, textPos.y - vH/2 + 10);
+                const vTxt = headerTextEl.value || '#VIRALIN';
+                ctx.font = 'italic bold ' + (fontSize * 0.75) + 'px "Montserrat"';
+                const vW = ctx.measureText(vTxt).width + 60,
+                    vH = 42;
+                ctx.fillStyle = '#0b579c';
+                ctx.fillRect(textPos.x + bW / 2 - vW / 2, textPos.y - vH + 10, vW, vH);
 
-                // Output Teks Utama Headline Hitam Bold Pekat
-                ctx.font = `bold ${fontSize}px "${fontFamily}"`;
-                ctx.fillStyle = '#000000'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+                ctx.fillStyle = '#facc15';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(vTxt, textPos.x + bW / 2, textPos.y - vH / 2 + 10);
+
+                ctx.font = 'bold ' + fontSize + 'px "' + fontFamily + '"';
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
                 let curY = textPos.y + 40;
-                lines.forEach(l => { ctx.fillText(l, textPos.x + bW/2, curY); curY += fontSize * 1.4; });
+                lines.forEach(l => { ctx.fillText(l, textPos.x + bW / 2, curY);
+                    curY += fontSize * 1.4; });
             }
 
             ctx.restore();
         }
 
-        // --- ENGINE EVENT DRAG AND DROP DETECTOR ---
+        // ============================================================
+        //  DRAG ENGINE
+        // ============================================================
         function getMousePos(e) {
             const rect = canvas.getBoundingClientRect();
             const scaleX = canvas.width / rect.width;
             const scaleY = canvas.height / rect.height;
-            let cX = e.touches ? e.touches[0].clientX : e.clientX;
-            let cY = e.touches ? e.touches[0].clientY : e.clientY;
+            const cX = e.touches ? e.touches[0].clientX : e.clientX;
+            const cY = e.touches ? e.touches[0].clientY : e.clientY;
             return { x: (cX - rect.left) * scaleX, y: (cY - rect.top) * scaleY };
         }
 
@@ -809,7 +918,7 @@
 
         function doDrag(e) {
             if (!isDragging) return;
-            if(e.cancelable) e.preventDefault();
+            if (e.cancelable) e.preventDefault();
             const pos = getMousePos(e);
             textPos.x = pos.x - dragOffset.x;
             textPos.y = pos.y - dragOffset.y;
@@ -825,7 +934,9 @@
         window.addEventListener('touchmove', doDrag, { passive: false });
         window.addEventListener('touchend', stopDrag);
 
-        // --- SISTEM DOWNLOADER INSTAN (MENDUKUNG MULTI-MEDIA VIDEO & GAMBAR) ---
+        // ============================================================
+        //  DOWNLOADER (image / video)
+        // ============================================================
         downloadBtn.addEventListener('click', function() {
             if (mediaType === 'image') {
                 const link = document.createElement('a');
@@ -833,15 +944,15 @@
                 link.href = canvas.toDataURL('image/jpeg', 0.96);
                 link.click();
             } else if (mediaType === 'video') {
-                downloadBtn.innerText = "Sedang Mengekspor Video (5 Detik)...";
+                downloadBtn.innerText = 'Sedang Mengekspor Video (5 Detik)...';
                 downloadBtn.disabled = true;
 
                 const chunks = [];
-                const stream = canvas.captureStream(30); 
-                
-                // Sinkronisasi Audio dari Video Asli jika terdeteksi
+                const stream = canvas.captureStream(30);
+
                 if (uploadedMedia && (uploadedMedia.captureStream || uploadedMedia.mozCaptureStream)) {
-                    const vStream = uploadedMedia.captureStream ? uploadedMedia.captureStream() : uploadedMedia.mozCaptureStream();
+                    const vStream = uploadedMedia.captureStream ? uploadedMedia.captureStream() : uploadedMedia
+                        .mozCaptureStream();
                     const audioTracks = vStream.getAudioTracks();
                     if (audioTracks.length > 0) stream.addTrack(audioTracks[0]);
                 }
@@ -854,14 +965,14 @@
                     link.download = 'frame_video_generate_' + Date.now() + '.webm';
                     link.href = URL.createObjectURL(blob);
                     link.click();
-                    downloadBtn.innerText = "Download Hasil Generate";
+                    downloadBtn.innerText = 'Download Hasil Generate';
                     downloadBtn.disabled = false;
                 };
 
                 recorder.start();
-                setTimeout(() => recorder.stop(), 5000); // Batas rekam cuplikan render video
+                setTimeout(() => recorder.stop(), 5000);
             }
         });
     </script>
 </body>
-</html>
+    </html>
