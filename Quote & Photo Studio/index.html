@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Quote & Photo Studio | Preview & Download Ultimate</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Quote Studio · Preview & Download</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+    </script>
+    <script src="https://unpkg.com/lucide@latest">
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Bebas+Neue&family=Caveat:wght@600&family=Cinzel:wght@600&family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@1,500&family=Montserrat:wght@800&family=Playfair+Display:ital,wght@0,600;1,600&family=Playpen+Sans:wght@600&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Bebas+Neue&family=Caveat:wght@600&family=Cinzel:wght@600&family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@1,500&family=Montserrat:wght@800&family=Playfair+Display:ital,wght@0,600;1,600&family=Playpen+Sans:wght@600&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet" />
     <script>
         tailwind.config = {
             theme: {
@@ -20,26 +23,38 @@
         }
     </script>
     <style>
-        * { box-sizing: border-box; user-select: none; }
-        body { font-family: 'Inter', sans-serif; background: #0b1120; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #2d3a5e; border-radius: 10px; }
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a1410;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f1915;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8a7a6e;
+            border-radius: 10px;
+        }
 
-        /* PREVIEW CANVAS CORE */
+        /* ── PREVIEW CANVAS ── */
         #preview-canvas {
-            aspect-ratio: 1 / 1;
+            position: relative;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            position: relative;
-            border-radius: 1rem;
-            transition: all 0.2s ease;
+            border-radius: 0.5rem;
             overflow: hidden;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.6);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.7);
+            width: 100%;
         }
 
-        /* Quote wrapper dynamic */
+        /* Quote wrapper */
         .quote-wrapper {
             position: absolute;
             transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
@@ -50,117 +65,315 @@
         }
 
         /* Preset positions */
-        .pos-center { top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-        .pos-top-left { top: 24px; left: 24px; text-align: left; }
-        .pos-top-right { top: 24px; right: 24px; text-align: right; }
-        .pos-bottom-left { bottom: 24px; left: 24px; text-align: left; }
-        .pos-bottom-right { bottom: 24px; right: 24px; text-align: right; }
+        .pos-center {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .pos-top-left {
+            top: 24px;
+            left: 24px;
+            text-align: left;
+        }
+        .pos-top-right {
+            top: 24px;
+            right: 24px;
+            text-align: right;
+        }
+        .pos-bottom-left {
+            bottom: 24px;
+            left: 24px;
+            text-align: left;
+        }
+        .pos-bottom-right {
+            bottom: 24px;
+            right: 24px;
+            text-align: right;
+        }
 
-        /* Background style for text wrapper */
-        .bg-none { background: transparent; backdrop-filter: none; border: none; padding: 0px; }
-        .bg-solid { background: rgba(0, 0, 0, 0.65); border-radius: 18px; padding: 16px 20px; backdrop-filter: none; border: none; }
-        .bg-glass { background: rgba(20, 30, 45, 0.35); backdrop-filter: blur(16px) saturate(180%); border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); padding: 16px 22px; }
-        .bg-gradient { background: linear-gradient(to top, rgba(0,0,0,0.85) 10%, transparent 85%); border-radius: 0px; padding: 40px 20px 20px 20px; width: 100%; max-width: 100%; }
+        /* ─── 15+ BACKGROUND STYLES ─── */
+        .bg-none {
+            background: transparent;
+            backdrop-filter: none;
+            border: none;
+            padding: 0px;
+        }
+        .bg-solid {
+            background: rgba(26, 20, 16, 0.78);
+            border-radius: 18px;
+            padding: 16px 20px;
+            backdrop-filter: none;
+            border: none;
+        }
+        .bg-glass {
+            background: rgba(45, 38, 33, 0.40);
+            backdrop-filter: blur(14px) saturate(180%);
+            border-radius: 24px;
+            border: 1px solid rgba(220, 200, 185, 0.20);
+            padding: 16px 22px;
+        }
+        .bg-gradient {
+            background: linear-gradient(to top, rgba(26, 20, 16, 0.92) 10%, transparent 85%);
+            border-radius: 0px;
+            padding: 40px 20px 20px 20px;
+            width: 100%;
+            max-width: 100%;
+        }
+        .bg-outline {
+            background: transparent;
+            border: 2px solid rgba(245, 237, 230, 0.6);
+            border-radius: 18px;
+            padding: 14px 18px;
+            backdrop-filter: none;
+        }
+        .bg-blur-light {
+            background: rgba(26, 20, 16, 0.25);
+            backdrop-filter: blur(6px);
+            border-radius: 20px;
+            padding: 14px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .bg-blur-heavy {
+            background: rgba(26, 20, 16, 0.55);
+            backdrop-filter: blur(22px) saturate(200%);
+            border-radius: 28px;
+            padding: 18px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .bg-double-border {
+            background: transparent;
+            border: 3px double rgba(212, 160, 106, 0.6);
+            border-radius: 20px;
+            padding: 14px 20px;
+        }
+        .bg-pill {
+            background: rgba(26, 20, 16, 0.70);
+            border-radius: 60px;
+            padding: 12px 28px;
+            backdrop-filter: none;
+            border: 1px solid rgba(212, 160, 106, 0.3);
+        }
+        .bg-underline {
+            background: transparent;
+            border-bottom: 4px solid rgba(212, 160, 106, 0.7);
+            padding: 6px 4px 12px 4px;
+            border-radius: 0;
+        }
+        .bg-highlight {
+            background: linear-gradient(180deg, transparent 60%, rgba(212, 160, 106, 0.35) 60%);
+            padding: 6px 12px;
+            border-radius: 0;
+        }
+        .bg-shadow-box {
+            background: transparent;
+            box-shadow: 0 8px 0 rgba(26, 20, 16, 0.6);
+            padding: 12px 18px;
+            border-radius: 8px;
+        }
+        .bg-inset {
+            background: transparent;
+            box-shadow: inset 0 0 0 3px rgba(245, 237, 230, 0.3);
+            padding: 14px 20px;
+            border-radius: 20px;
+        }
+        .bg-ribbon {
+            background: rgba(212, 160, 106, 0.25);
+            border-left: 6px solid #d4a06a;
+            border-radius: 0 12px 12px 0;
+            padding: 12px 20px;
+        }
+        .bg-stroke {
+            background: transparent;
+            -webkit-text-stroke: 1px rgba(245, 237, 230, 0.3);
+            padding: 8px 14px;
+            border-radius: 0;
+        }
+        .bg-neon {
+            background: rgba(212, 160, 106, 0.15);
+            box-shadow: 0 0 20px rgba(212, 160, 106, 0.25);
+            border-radius: 30px;
+            padding: 16px 24px;
+            border: 1px solid rgba(212, 160, 106, 0.3);
+        }
 
-        /* Text Shadows */
-        .shadow-soft { text-shadow: 0 4px 14px rgba(0,0,0,0.7); }
-        .shadow-hard { text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; }
-        .shadow-glow { text-shadow: 0 0 8px rgba(255,255,240,0.8), 0 0 20px rgba(0,0,0,0.5); }
-        .shadow-none { text-shadow: none; }
-
-        /* ========== 10 UNIQUE PHOTO FILTERS (overlay/pseudo) ========== */
-        .style-1 { filter: none; }
-        .style-2 { filter: grayscale(100%) contrast(120%) brightness(1.02); }
-        .style-3 { filter: sepia(70%) contrast(115%) brightness(0.96); }
-        .style-4::after { content: ''; position: absolute; inset: 0; background: linear-gradient(145deg, rgba(255,215,0,0.2), rgba(255,100,0,0.25)); pointer-events: none; z-index: 2; mix-blend-mode: overlay; }
-        .style-5::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.55); pointer-events: none; z-index: 2; }
-        .style-6::after { content: ''; position: absolute; inset: 20px; border: 3px dashed rgba(255,255,200,0.7); border-radius: 30px; pointer-events: none; z-index: 3; }
-        .style-7::after { content: ''; position: absolute; inset: 14px; border: 3px solid rgba(255,255,255,0.9); border-radius: 24px; pointer-events: none; z-index: 3; box-shadow: 0 0 0 2px rgba(0,0,0,0.3); }
-        .style-8::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.85) 100%); pointer-events: none; z-index: 2; }
-        .style-9 { filter: saturate(180%) contrast(105%) brightness(1.08); }
-        .style-10::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(0,255,255,0.08), rgba(255,0,200,0.08) 15px); pointer-events: none; z-index: 2; mix-blend-mode: color-dodge; }
-
-        /* ensure pseudo-elements work on relative */
-        #preview-canvas { position: relative; }
-        #preview-canvas::before, #preview-canvas::after { transition: all 0.2s; }
+        /* ─── 15+ TEXT SHADOW STYLES ─── */
+        .shadow-soft {
+            text-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+        }
+        .shadow-hard {
+            text-shadow: 2px 2px 0 #1a1410, -1px -1px 0 #1a1410, 1px -1px 0 #1a1410, -1px 1px 0 #1a1410;
+        }
+        .shadow-glow {
+            text-shadow: 0 0 10px rgba(245, 235, 225, 0.6), 0 0 28px rgba(0, 0, 0, 0.5);
+        }
+        .shadow-none {
+            text-shadow: none;
+        }
+        .shadow-drop {
+            text-shadow: 0 6px 12px rgba(0, 0, 0, 0.8);
+        }
+        .shadow-long {
+            text-shadow: 0 12px 24px rgba(0, 0, 0, 0.9), 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .shadow-outline {
+            text-shadow: -2px -2px 0 #1a1410, 2px -2px 0 #1a1410, -2px 2px 0 #1a1410, 2px 2px 0 #1a1410, 0 0 0 #1a1410;
+        }
+        .shadow-3d {
+            text-shadow: 0 1px 0 #1a1410, 0 2px 0 #1a1410, 0 3px 0 #1a1410, 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .shadow-blur {
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 0, 0, 0.6);
+        }
+        .shadow-neon {
+            text-shadow: 0 0 8px rgba(212, 160, 106, 0.8), 0 0 24px rgba(212, 160, 106, 0.4), 0 0 48px rgba(212, 160, 106, 0.2);
+        }
+        .shadow-emboss {
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.2), -1px -1px 0 rgba(0, 0, 0, 0.6);
+        }
+        .shadow-inset {
+            text-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        .shadow-spread {
+            text-shadow: 0 0 4px #1a1410, 0 0 8px #1a1410, 0 0 16px #1a1410;
+        }
+        .shadow-double {
+            text-shadow: 2px 2px 0 #1a1410, 4px 4px 0 rgba(212, 160, 106, 0.4);
+        }
+        .shadow-color {
+            text-shadow: 0 0 12px rgba(212, 160, 106, 0.7), 0 0 30px rgba(212, 160, 106, 0.3);
+        }
+        .shadow-fire {
+            text-shadow: 0 0 6px #ff7e5f, 0 0 18px #feb47b, 0 0 36px #ff6a00;
+        }
 
         /* draggable mode */
-        .draggable-active .quote-wrapper { cursor: grab; }
-        .draggable-active .quote-wrapper:active { cursor: grabbing; }
+        .draggable-active .quote-wrapper {
+            cursor: grab;
+        }
+        .draggable-active .quote-wrapper:active {
+            cursor: grabbing;
+        }
 
-        /* buttons / animation */
-        .style-btn-active { background: #14b8a6 !important; color: white !important; border-color: #0d9488 !important; box-shadow: 0 5px 12px rgba(20,184,166,0.3); }
-        .drag-toggle-active { background: #0d9488 !important; color: white !important; border-color: #0f766e !important; }
+        .drag-toggle-active {
+            background: #b88a72 !important;
+            color: #1a1410 !important;
+            border-color: #a57862 !important;
+        }
 
         /* toast */
-        .toast-visible { transform: translateX(0); opacity: 1; transition: all 0.4s cubic-bezier(0.2, 1.2, 0.4, 1); }
-        .toast-exit { transform: translateX(120%); opacity: 0; transition: all 0.3s ease; }
+        .toast-visible {
+            transform: translateX(0);
+            opacity: 1;
+            transition: all 0.4s cubic-bezier(0.2, 1.2, 0.4, 1);
+        }
+        .toast-exit {
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
 
         /* range */
-        input[type="range"] { -webkit-appearance: none; background: transparent; }
-        input[type="range"]::-webkit-slider-track { height: 5px; border-radius: 10px; background: linear-gradient(90deg, #0d9488, #3b82f6); }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: white; border-radius: 50%; box-shadow: 0 2px 8px black; cursor: pointer; margin-top: -6px; }
-        input[type="color"]::-webkit-color-swatch { border-radius: 12px; border: none; }
-        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 200ms; }
+        input[type="range"] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type="range"]::-webkit-slider-track {
+            height: 5px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #b88a72, #d4a06a);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #f0e8e0;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            margin-top: -6px;
+            border: 2px solid #b88a72;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border-radius: 12px;
+            border: none;
+        }
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
+
+        /* drop zone */
+        #drop-zone {
+            transition: all 0.25s ease;
+        }
+        #drop-zone.drag-over {
+            border-color: #d4a06a;
+            background: rgba(212, 160, 106, 0.08);
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 min-h-screen">
+<body class="bg-gradient-to-br from-[#1a1410] via-[#251e19] to-[#1a1410] text-[#f0e8e0] min-h-screen">
 
     <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
     <div class="container mx-auto px-4 py-6 lg:py-8 max-w-7xl">
-        <!-- Header dengan preview interaktif -->
+
+        <!-- HEADER -->
         <header class="text-center mb-8">
-            <div class="inline-flex items-center gap-2 bg-teal-500/10 border border-teal-500/20 rounded-full px-4 py-1.5 mb-4">
-                <span class="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></span>
-                <span class="text-xs font-bold text-teal-400 tracking-wider">PREMIUM VISUAL STUDIO</span>
+            <div class="inline-flex items-center gap-2 bg-[#d4a06a]/10 border border-[#d4a06a]/20 rounded-full px-4 py-1.5 mb-4">
+                <span class="w-2 h-2 bg-[#d4a06a] rounded-full animate-pulse"></span>
+                <span class="text-xs font-bold text-[#d4a06a] tracking-wider">VISUAL QUOTE STUDIO</span>
             </div>
-            <h1 class="text-4xl sm:text-6xl font-black bg-gradient-to-r from-teal-300 via-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tight">
-                Quote & Photo Studio
+            <h1 class="text-4xl sm:text-6xl font-black bg-gradient-to-r from-[#e8d5c4] via-[#d4a06a] to-[#c4847a] bg-clip-text text-transparent tracking-tight">
+                Quote &amp; Photo Studio
             </h1>
-            <p class="text-slate-500 mt-3 text-sm max-w-xl mx-auto">Preview real-time + unduh kualitas tinggi. Drag teks, filter sinematik, font eksklusif.</p>
+            <p class="text-[#b5a89e] mt-3 text-sm max-w-xl mx-auto">Tulis kutipan, sesuaikan gaya, unduh dengan rasio foto asli.</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-            <!-- Panel kontrol kiri -->
+
+            <!-- ─── PANEL KIRI ─── -->
             <div class="lg:col-span-5 space-y-5">
-                <!-- Upload area -->
-                <div class="bg-slate-900/70 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60 shadow-xl">
+
+                <!-- Upload -->
+                <div class="bg-[#2d2420]/80 backdrop-blur-md p-5 rounded-2xl border border-[#4a3d36]/50 shadow-xl">
                     <div class="flex items-center gap-2 mb-3">
-                        <i data-lucide="image-up" class="w-5 h-5 text-teal-400"></i>
-                        <h3 class="font-bold text-sm uppercase tracking-wider text-teal-400">1. Unggah Background</h3>
+                        <i data-lucide="image-up" class="w-5 h-5 text-[#d4a06a]"></i>
+                        <h3 class="font-bold text-sm uppercase tracking-wider text-[#d4a06a]">1. Unggah Foto</h3>
                     </div>
-                    <label for="image-loader" id="drop-zone" class="relative flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-700 rounded-xl cursor-pointer hover:border-teal-500/70 hover:bg-teal-500/5 transition-all overflow-hidden">
+                    <label for="image-loader" id="drop-zone" class="relative flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-[#4a3d36] rounded-xl cursor-pointer hover:border-[#d4a06a]/70 hover:bg-[#d4a06a]/5 transition-all overflow-hidden">
                         <div id="drop-zone-content" class="flex flex-col items-center justify-center py-4">
-                            <i data-lucide="cloud-upload" class="w-10 h-10 text-slate-500 mb-1"></i>
-                            <p class="text-sm text-slate-400 font-medium">Klik atau drag foto</p>
-                            <p class="text-xs text-slate-600">JPG, PNG, WEBP</p>
+                            <i data-lucide="cloud-upload" class="w-10 h-10 text-[#8a7a6e] mb-1"></i>
+                            <p class="text-sm text-[#b5a89e] font-medium">Klik atau drag foto</p>
+                            <p class="text-xs text-[#6a5d54]">JPG, PNG, WEBP</p>
                         </div>
                         <div id="drop-zone-preview" class="absolute inset-0 bg-cover bg-center hidden"></div>
                         <input type="file" id="image-loader" class="hidden" accept="image/*" />
                     </label>
                 </div>
 
-                <!-- Kutipan Teks -->
-                <div class="bg-slate-900/70 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60">
+                <!-- Kutipan -->
+                <div class="bg-[#2d2420]/80 backdrop-blur-md p-5 rounded-2xl border border-[#4a3d36]/50">
                     <div class="flex items-center gap-2 mb-3">
-                        <i data-lucide="quote" class="w-5 h-5 text-cyan-400"></i>
-                        <h3 class="font-bold text-sm uppercase text-cyan-400">2. Kutipan & Penulis</h3>
+                        <i data-lucide="quote" class="w-5 h-5 text-[#d4a06a]"></i>
+                        <h3 class="font-bold text-sm uppercase text-[#d4a06a]">2. Kutipan &amp; Penulis</h3>
                     </div>
-                    <textarea id="quote-text" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white placeholder-slate-600 focus:ring-2 focus:ring-teal-500/60 focus:border-teal-500 transition-all resize-none" placeholder="Tulis kutipanmu...">Hidup adalah petualangan yang berani.</textarea>
-                    <input id="author-text" type="text" class="mt-3 w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-teal-500/60" placeholder="Nama penulis (opsional)">
+                    <textarea id="quote-text" rows="2" class="w-full bg-[#1a1410] border border-[#4a3d36] rounded-xl p-3 text-[#f0e8e0] placeholder-[#6a5d54] focus:ring-2 focus:ring-[#d4a06a]/60 focus:border-[#d4a06a] transition-all resize-none" placeholder="Tulis kutipanmu…">Hidup adalah petualangan yang berani.</textarea>
+                    <input id="author-text" type="text" class="mt-3 w-full bg-[#1a1410] border border-[#4a3d36] rounded-xl p-3 text-sm text-[#f0e8e0] placeholder-[#6a5d54] focus:ring-2 focus:ring-[#d4a06a]/60" placeholder="Nama penulis (opsional)" />
                 </div>
 
-                <!-- Tipografi & Warna -->
-                <div class="bg-slate-900/70 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60">
+                <!-- Tipografi -->
+                <div class="bg-[#2d2420]/80 backdrop-blur-md p-5 rounded-2xl border border-[#4a3d36]/50">
                     <div class="flex items-center gap-2 mb-3">
-                        <i data-lucide="type" class="w-5 h-5 text-blue-400"></i>
-                        <h3 class="font-bold text-sm uppercase text-blue-400">3. Gaya Teks</h3>
+                        <i data-lucide="type" class="w-5 h-5 text-[#d4a06a]"></i>
+                        <h3 class="font-bold text-sm uppercase text-[#d4a06a]">3. Gaya Teks</h3>
                     </div>
                     <div class="grid grid-cols-2 gap-3 mb-3">
                         <div>
-                            <label class="text-[11px] text-slate-500 uppercase">Font</label>
-                            <select id="font-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm mt-1">
+                            <label class="text-[11px] text-[#8a7a6e] uppercase">Font</label>
+                            <select id="font-select" class="w-full bg-[#1a1410] border border-[#4a3d36] rounded-xl p-2 text-sm mt-1 text-[#f0e8e0]">
                                 <option value="'Inter', sans-serif">Inter (Modern)</option>
                                 <option value="'Bebas Neue', sans-serif">Bebas Neue (Bold)</option>
                                 <option value="'Playfair Display', serif">Playfair (Elegant)</option>
@@ -174,42 +387,54 @@
                             </select>
                         </div>
                         <div>
-                            <label class="text-[11px] text-slate-500 uppercase">Ukuran <span id="size-val" class="text-teal-400">28</span>px</label>
-                            <input type="range" id="text-size" min="16" max="64" value="28" class="w-full mt-1">
+                            <label class="text-[11px] text-[#8a7a6e] uppercase">Ukuran <span id="size-val" class="text-[#d4a06a]">28</span>px</label>
+                            <input type="range" id="text-size" min="16" max="72" value="28" class="w-full mt-1" />
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="text-[11px] text-slate-500 uppercase">Warna Teks</label>
+                        <label class="text-[11px] text-[#8a7a6e] uppercase">Warna Teks</label>
                         <div class="flex items-center gap-3 mt-1 flex-wrap">
-                            <input type="color" id="text-color" value="#FFFFFF" class="w-8 h-8 rounded-xl border border-slate-700">
-                            <span id="color-hex" class="text-xs font-mono text-slate-400">#FFFFFF</span>
+                            <input type="color" id="text-color" value="#F5EDE6" class="w-8 h-8 rounded-xl border border-[#4a3d36]" />
+                            <span id="color-hex" class="text-xs font-mono text-[#8a7a6e]">#F5EDE6</span>
                             <div class="flex gap-1 ml-auto">
-                                <button data-color="#ffffff" class="color-preset w-6 h-6 rounded-full bg-white border border-slate-600"></button>
-                                <button data-color="#facc15" class="color-preset w-6 h-6 rounded-full bg-amber-400"></button>
-                                <button data-color="#f472b6" class="color-preset w-6 h-6 rounded-full bg-pink-400"></button>
-                                <button data-color="#4ade80" class="color-preset w-6 h-6 rounded-full bg-emerald-400"></button>
-                                <button data-color="#60a5fa" class="color-preset w-6 h-6 rounded-full bg-blue-400"></button>
-                                <button data-color="#000000" class="color-preset w-6 h-6 rounded-full bg-black border border-white"></button>
+                                <button data-color="#f5ede6" class="color-preset w-6 h-6 rounded-full bg-[#f5ede6] border border-[#6a5d54]"></button>
+                                <button data-color="#d4a06a" class="color-preset w-6 h-6 rounded-full bg-[#d4a06a] border border-[#6a5d54]"></button>
+                                <button data-color="#c4847a" class="color-preset w-6 h-6 rounded-full bg-[#c4847a] border border-[#6a5d54]"></button>
+                                <button data-color="#b5a89e" class="color-preset w-6 h-6 rounded-full bg-[#b5a89e] border border-[#6a5d54]"></button>
+                                <button data-color="#e8d5c4" class="color-preset w-6 h-6 rounded-full bg-[#e8d5c4] border border-[#6a5d54]"></button>
+                                <button data-color="#1a1410" class="color-preset w-6 h-6 rounded-full bg-[#1a1410] border border-[#6a5d54]"></button>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <label class="text-[11px] text-slate-500 uppercase">Bayangan Teks</label>
-                        <select id="shadow-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm mt-1">
+                        <label class="text-[11px] text-[#8a7a6e] uppercase">Bayangan Teks</label>
+                        <select id="shadow-select" class="w-full bg-[#1a1410] border border-[#4a3d36] rounded-xl p-2 text-sm mt-1 text-[#f0e8e0]">
                             <option value="shadow-soft">Lembut ✦</option>
                             <option value="shadow-hard">Stroke Tegas ▮</option>
                             <option value="shadow-glow">Glow ☀</option>
                             <option value="shadow-none">Tanpa Bayangan</option>
+                            <option value="shadow-drop">Drop Shadow</option>
+                            <option value="shadow-long">Bayangan Panjang</option>
+                            <option value="shadow-outline">Outline</option>
+                            <option value="shadow-3d">3D</option>
+                            <option value="shadow-blur">Blur</option>
+                            <option value="shadow-neon">Neon</option>
+                            <option value="shadow-emboss">Emboss</option>
+                            <option value="shadow-inset">Inset</option>
+                            <option value="shadow-spread">Spread</option>
+                            <option value="shadow-double">Ganda</option>
+                            <option value="shadow-color">Berwarna</option>
+                            <option value="shadow-fire">Api</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Posisi & Alas serta filter -->
-                <div class="bg-slate-900/70 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60">
-                    <div class="grid grid-cols-2 gap-3 mb-4">
+                <!-- Posisi & Alas -->
+                <div class="bg-[#2d2420]/80 backdrop-blur-md p-5 rounded-2xl border border-[#4a3d36]/50">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="text-[11px] text-slate-500 uppercase">Posisi Teks</label>
-                            <select id="pos-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm mt-1">
+                            <label class="text-[11px] text-[#8a7a6e] uppercase">Posisi Teks</label>
+                            <select id="pos-select" class="w-full bg-[#1a1410] border border-[#4a3d36] rounded-xl p-2 text-sm mt-1 text-[#f0e8e0]">
                                 <option value="pos-center">Tengah</option>
                                 <option value="pos-top-left">Kiri Atas</option>
                                 <option value="pos-top-right">Kanan Atas</option>
@@ -218,63 +443,73 @@
                             </select>
                         </div>
                         <div>
-                            <label class="text-[11px] text-slate-500 uppercase">Alas Teks</label>
-                            <select id="bg-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm mt-1">
+                            <label class="text-[11px] text-[#8a7a6e] uppercase">Alas Teks</label>
+                            <select id="bg-select" class="w-full bg-[#1a1410] border border-[#4a3d36] rounded-xl p-2 text-sm mt-1 text-[#f0e8e0]">
                                 <option value="bg-none">Tanpa Alas</option>
-                                <option value="bg-solid">Blok Hitam</option>
+                                <option value="bg-solid">Blok Gelap</option>
                                 <option value="bg-glass">Glassmorphism</option>
                                 <option value="bg-gradient">Gradasi Bawah</option>
+                                <option value="bg-outline">Outline</option>
+                                <option value="bg-blur-light">Blur Ringan</option>
+                                <option value="bg-blur-heavy">Blur Berat</option>
+                                <option value="bg-double-border">Border Ganda</option>
+                                <option value="bg-pill">Pil</option>
+                                <option value="bg-underline">Garis Bawah</option>
+                                <option value="bg-highlight">Highlighter</option>
+                                <option value="bg-shadow-box">Kotak Bayangan</option>
+                                <option value="bg-inset">Inset</option>
+                                <option value="bg-ribbon">Pita</option>
+                                <option value="bg-stroke">Stroke</option>
+                                <option value="bg-neon">Neon</option>
                             </select>
                         </div>
                     </div>
-                    <div>
-                        <label class="text-[11px] text-slate-500 uppercase flex items-center gap-2"><i data-lucide="sparkles" class="w-3 h-3"></i> Filter & Frame Pro</label>
-                        <div class="grid grid-cols-5 gap-2 mt-2" id="style-grid"></div>
-                    </div>
                 </div>
 
-                <!-- Tombol Download dan drag toggle -->
+                <!-- Tombol -->
                 <div class="flex gap-3">
-                    <button id="drag-toggle" class="flex-1 flex items-center justify-center gap-2 bg-slate-800 border border-slate-700 rounded-xl py-3 text-sm font-semibold text-slate-300 hover:text-white transition-all cursor-pointer">
+                    <button id="drag-toggle" class="flex-1 flex items-center justify-center gap-2 bg-[#2d2420] border border-[#4a3d36] rounded-xl py-3 text-sm font-semibold text-[#b5a89e] hover:text-[#f0e8e0] transition-all cursor-pointer">
                         <i data-lucide="move" class="w-4 h-4"></i> Seret Teks
                     </button>
-                    <button id="download-btn" class="flex-1 bg-gradient-to-r from-teal-500 to-cyan-600 hover:shadow-xl hover:shadow-teal-500/30 rounded-xl py-3 font-bold text-white flex items-center justify-center gap-2 transition-all transform active:scale-95">
+                    <button id="download-btn" class="flex-1 bg-gradient-to-r from-[#d4a06a] to-[#c4847a] hover:shadow-xl hover:shadow-[#d4a06a]/30 rounded-xl py-3 font-bold text-[#1a1410] flex items-center justify-center gap-2 transition-all transform active:scale-95">
                         <i data-lucide="download" class="w-5 h-5"></i> Unduh PNG
                     </button>
                 </div>
-                <p class="text-[11px] text-center text-slate-600 mt-2">✨ Klik "Seret Teks" lalu geser bebas di area preview</p>
+                <p class="text-[11px] text-center text-[#6a5d54] mt-2">✨ Klik "Seret Teks" lalu geser bebas di area preview</p>
             </div>
 
-            <!-- Panel kanan: Preview area utama + download final -->
+            <!-- ─── PANEL KANAN: PREVIEW ─── -->
             <div class="lg:col-span-7 flex flex-col items-center">
-                <div class="w-full max-w-[580px]">
+                <div class="w-full max-w-[620px]">
                     <div class="flex items-center justify-between mb-2 px-2">
-                        <div class="flex items-center gap-2 text-xs text-slate-500"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Pratinjau Langsung</div>
-                        <div class="text-[11px] bg-slate-800/50 px-3 py-1 rounded-full text-slate-400">1:1 Square</div>
+                        <div class="flex items-center gap-2 text-xs text-[#8a7a6e]"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Pratinjau Langsung</div>
+                        <div class="text-[11px] bg-[#2d2420]/60 px-3 py-1 rounded-full text-[#8a7a6e]">Rasio otomatis</div>
                     </div>
                     <!-- Canvas Preview Card -->
-                    <div class="bg-black/40 backdrop-blur-sm p-3 rounded-2xl shadow-2xl border border-slate-800">
-                        <div id="preview-canvas" class="style-1 rounded-xl w-full bg-slate-800" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIiB2aWV3Qm94PSIwIDAgODAwIDgwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzFjMmEzZSIvPjxjaXJjbGUgY3g9IjQwMCIgY3k9IjQwMCIgcj0iMjUwIiBmaWxsPSIjMjA0NzQzIiBmaWxsLW9wYWNpdHk9IjAuNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNThhN2ZmIiBmb250LWZhbWlseT0iTW9ub3RleHQiIGZvbnQtc2l6ZT0iMjQiPkJhY2tncm91bmQgSW1hZ2U8L3RleHQ+PC9zdmc+'); background-size: cover;">
+                    <div class="bg-[#1a1410]/80 backdrop-blur-sm p-3 rounded-2xl shadow-2xl border border-[#4a3d36]/50">
+                        <div id="preview-canvas" class="rounded-xl w-full bg-[#2d2420]" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIiB2aWV3Qm94PSIwIDAgODAwIDgwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzJkMjQyMCIvPjxjaXJjbGUgY3g9IjQwMCIgY3k9IjQwMCIgcj0iMjUwIiBmaWxsPSIjNGEzZDM2IiBmaWxsLW9wYWNpdHk9IjAuNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjYjVhODllIiBmb250LWZhbWlseT0iTW9ub3RleHQiIGZvbnQtc2l6ZT0iMjQiPkJhY2tncm91bmQgSW1hZ2U8L3RleHQ+PC9zdmc+'); background-size: cover;">
                             <div id="quote-box" class="quote-wrapper pos-center bg-none">
-                                <p id="quote-display" class="font-semibold shadow-soft leading-tight transition-all" style="font-family: 'Inter', sans-serif; font-size:28px; color:#ffffff;">
+                                <p id="quote-display" class="font-semibold shadow-soft leading-tight transition-all" style="font-family: 'Inter', sans-serif; font-size:28px; color:#f5ede6;">
                                     "Hidup adalah petualangan yang berani."
                                 </p>
-                                <p id="author-display" class="mt-2 text-sm opacity-80 hidden transition-all" style="font-family: 'Inter', sans-serif; color:#ffffff;"></p>
+                                <p id="author-display" class="mt-2 text-sm opacity-80 hidden transition-all" style="font-family: 'Inter', sans-serif; color:#f5ede6;"></p>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-4 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl p-3 flex gap-2 justify-center">
-                        <i data-lucide="info" class="w-3 h-3"></i> Aktifkan mode SERET untuk memposisikan teks secara bebas. Download dengan resolusi tajam 2.5x.
+                    <div class="mt-4 text-center text-xs text-[#6a5d54] bg-[#2d2420]/40 rounded-xl p-3 flex gap-2 justify-center">
+                        <i data-lucide="info" class="w-3 h-3"></i> Aktifkan mode SERET untuk memposisikan teks bebas. Download dengan rasio foto asli.
                     </div>
                 </div>
             </div>
         </div>
-        <footer class="mt-12 text-center text-slate-700 text-[10px]">© Quote Studio · Tanpa server · Preview & download langsung dari browser</footer>
+
+        <footer class="mt-12 text-center text-[#4a3d36] text-[10px]">© Quote Studio · Tanpa server · Preview &amp; download langsung dari browser</footer>
     </div>
 
     <script>
         lucide.createIcons();
-        // ------------------- ELEMENTS -------------------
+
+        // ─── ELEMENTS ───
         const previewCanvas = document.getElementById('preview-canvas');
         const quoteBox = document.getElementById('quote-box');
         const quoteDisplay = document.getElementById('quote-display');
@@ -296,34 +531,9 @@
         const dropZonePreviewDiv = document.getElementById('drop-zone-preview');
         const dropZoneContentDiv = document.getElementById('drop-zone-content');
 
-        // ---------- STYLE GRID (10 filter) ----------
-        const styleList = [
-            { id:1, name:'Normal', icon:'image' }, { id:2, name:'B&W', icon:'contrast' },
-            { id:3, name:'Sepia', icon:'sunset' }, { id:4, name:'Glow', icon:'flame' },
-            { id:5, name:'Dark', icon:'moon' }, { id:6, name:'Dashed', icon:'square-dashed-bottom' },
-            { id:7, name:'Frame', icon:'square' }, { id:8, name:'Vignette', icon:'aperture' },
-            { id:9, name:'Vivid', icon:'rainbow' }, { id:10, name:'Cyber', icon:'zap' }
-        ];
-        const styleGrid = document.getElementById('style-grid');
-        let currentStyle = 1;
+        let currentAspectRatio = 1 / 1; // default
 
-        styleList.forEach(st => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = `flex flex-col items-center gap-1 p-1.5 text-[10px] font-bold rounded-xl border transition-all ${st.id===1 ? 'border-teal-500 bg-teal-500/20 text-teal-300' : 'border-slate-800 bg-slate-950 text-slate-500 hover:border-slate-600'}`;
-            btn.innerHTML = `<i data-lucide="${st.icon}" class="w-3.5 h-3.5"></i><span>${st.name}</span>`;
-            btn.onclick = () => {
-                styleList.forEach(s => previewCanvas.classList.remove(`style-${s.id}`));
-                previewCanvas.classList.add(`style-${st.id}`);
-                currentStyle = st.id;
-                Array.from(styleGrid.children).forEach(c => c.classList.remove('border-teal-500', 'bg-teal-500/20', 'text-teal-300'));
-                btn.classList.add('border-teal-500', 'bg-teal-500/20', 'text-teal-300');
-            };
-            styleGrid.appendChild(btn);
-        });
-        lucide.createIcons({ nodes: styleGrid });
-
-        // Helper: refresh text layout & background wrapper
+        // ─── REFRESH LAYOUT ───
         function refreshTextLayout() {
             const posVal = posSelect.value;
             const bgVal = bgSelect.value;
@@ -332,14 +542,14 @@
             quoteDisplay.className = `font-semibold ${shadowVal} break-words transition-all leading-snug`;
         }
 
-        // Sync teks realtime
+        // ─── SYNC TEKS ───
         quoteTextarea.addEventListener('input', () => {
             let txt = quoteTextarea.value.trim();
-            if(txt === "") txt = "Kutipan indah";
+            if (txt === '') txt = 'Kutipan indah';
             quoteDisplay.innerText = `"${txt}"`;
         });
         authorInput.addEventListener('input', () => {
-            if(authorInput.value.trim() !== "") {
+            if (authorInput.value.trim() !== '') {
                 authorDisplay.innerText = `— ${authorInput.value.trim()}`;
                 authorDisplay.classList.remove('hidden');
             } else authorDisplay.classList.add('hidden');
@@ -363,7 +573,7 @@
 
         // color preset
         document.querySelectorAll('.color-preset').forEach(preset => {
-            preset.addEventListener('click', (e) => {
+            preset.addEventListener('click', () => {
                 const col = preset.dataset.color;
                 textColorPicker.value = col;
                 quoteDisplay.style.color = col;
@@ -372,50 +582,71 @@
             });
         });
 
-        // ---------- UPLOAD IMAGE (drag & click) ----------
-        imageLoader.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    previewCanvas.style.backgroundImage = `url(${ev.target.result})`;
-                    dropZonePreviewDiv.style.backgroundImage = `url(${ev.target.result})`;
+        // ─── UPLOAD IMAGE (dengan aspek rasio) ───
+        function handleImageFile(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const dataUrl = ev.target.result;
+                const img = new Image();
+                img.onload = () => {
+                    const w = img.naturalWidth;
+                    const h = img.naturalHeight;
+                    const ratio = w / h;
+                    currentAspectRatio = ratio;
+                    previewCanvas.style.aspectRatio = `${w} / ${h}`;
+                    previewCanvas.style.backgroundImage = `url(${dataUrl})`;
+                    dropZonePreviewDiv.style.backgroundImage = `url(${dataUrl})`;
                     dropZonePreviewDiv.classList.remove('hidden');
                     dropZoneContentDiv.classList.add('hidden');
-                    showToast('🖼️ Foto berhasil diunggah!', 'success');
+                    showToast('🖼️ Foto terunggah · rasio ' + w + ':' + h, 'success');
                 };
-                reader.readAsDataURL(file);
-            }
+                img.src = dataUrl;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        imageLoader.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleImageFile(file);
         });
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-teal-500','bg-teal-500/10'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-teal-500','bg-teal-500/10'));
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.classList.remove('border-teal-500','bg-teal-500/10');
+            dropZone.classList.remove('drag-over');
             const file = e.dataTransfer.files[0];
-            if(file && file.type.startsWith('image/')) {
+            if (file && file.type.startsWith('image/')) {
                 imageLoader.files = e.dataTransfer.files;
                 imageLoader.dispatchEvent(new Event('change'));
             }
         });
 
-        // ---------- DRAG MODE (geser teks bebas) ----------
+        // ─── DRAG MODE ───
         let dragModeActive = false;
         let isDraggingMove = false;
-        let dragStartX = 0, dragStartY = 0, startLeft = 0, startTop = 0;
+        let dragStartX = 0,
+            dragStartY = 0,
+            startLeft = 0,
+            startTop = 0;
+
         dragToggleBtn.addEventListener('click', () => {
             dragModeActive = !dragModeActive;
-            if(dragModeActive) {
+            if (dragModeActive) {
                 previewCanvas.classList.add('draggable-active');
                 dragToggleBtn.classList.add('drag-toggle-active');
-                // reset to absolute positions (keep current coordinates)
                 const rect = quoteBox.getBoundingClientRect();
-                const parentRect = previewCanvas.getBoundingClientRect();
                 let leftVal = quoteBox.offsetLeft;
                 let topVal = quoteBox.offsetTop;
-                if(posSelect.value === 'pos-center') {
-                    leftVal = (previewCanvas.clientWidth - quoteBox.offsetWidth)/2;
-                    topVal = (previewCanvas.clientHeight - quoteBox.offsetHeight)/2;
+                if (posSelect.value === 'pos-center') {
+                    leftVal = (previewCanvas.clientWidth - quoteBox.offsetWidth) / 2;
+                    topVal = (previewCanvas.clientHeight - quoteBox.offsetHeight) / 2;
                 }
                 quoteBox.style.left = leftVal + 'px';
                 quoteBox.style.top = topVal + 'px';
@@ -423,7 +654,6 @@
                 quoteBox.style.bottom = 'auto';
                 quoteBox.style.transform = 'none';
                 posSelect.disabled = true;
-                bgSelect.disabled = false; // bg tetap bisa
                 showToast('Mode seret aktif! Geser teks di area preview', 'info');
             } else {
                 previewCanvas.classList.remove('draggable-active');
@@ -437,7 +667,7 @@
         });
 
         function startDrag(e) {
-            if(!dragModeActive) return;
+            if (!dragModeActive) return;
             e.preventDefault();
             isDraggingMove = true;
             const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
@@ -447,8 +677,9 @@
             startLeft = quoteBox.offsetLeft;
             startTop = quoteBox.offsetTop;
         }
+
         function onDragMove(e) {
-            if(!isDraggingMove || !dragModeActive) return;
+            if (!isDraggingMove || !dragModeActive) return;
             const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
             const clientY = e.clientY ?? (e.touches ? e.touches[0].clientY : 0);
             let dx = clientX - dragStartX;
@@ -462,21 +693,24 @@
             quoteBox.style.left = newLeft + 'px';
             quoteBox.style.top = newTop + 'px';
         }
+
         function stopDrag() { isDraggingMove = false; }
+
         quoteBox.addEventListener('mousedown', startDrag);
         document.addEventListener('mousemove', onDragMove);
         document.addEventListener('mouseup', stopDrag);
-        quoteBox.addEventListener('touchstart', startDrag, {passive:false});
-        document.addEventListener('touchmove', onDragMove, {passive:false});
+        quoteBox.addEventListener('touchstart', startDrag, { passive: false });
+        document.addEventListener('touchmove', onDragMove, { passive: false });
         document.addEventListener('touchend', stopDrag);
 
-        // ---------- TOAST ----------
-        function showToast(msg, type='success') {
+        // ─── TOAST ───
+        function showToast(msg, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const icon = type==='success' ? 'check-circle' : (type==='error' ? 'alert-circle' : 'info');
-            toast.className = `pointer-events-auto flex items-center gap-3 bg-slate-800 border-l-4 border-teal-500 text-white rounded-xl px-4 py-3 shadow-2xl text-sm font-medium toast-visible`;
-            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-teal-400"></i><span>${msg}</span>`;
+            const icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
+            toast.className =
+                `pointer-events-auto flex items-center gap-3 bg-[#2d2420] border-l-4 border-[#d4a06a] text-[#f0e8e0] rounded-xl px-4 py-3 shadow-2xl text-sm font-medium toast-visible`;
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-[#d4a06a]"></i><span>${msg}</span>`;
             container.appendChild(toast);
             lucide.createIcons({ nodes: [toast] });
             setTimeout(() => {
@@ -485,26 +719,28 @@
             }, 2800);
         }
 
-        // ---------- DOWNLOAD PREMIUM (FULL PREVIEW CAPTURE) ----------
+        // ─── DOWNLOAD ───
         downloadBtn.addEventListener('click', async () => {
             downloadBtn.disabled = true;
             const originalHtml = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = `<svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Memproses...`;
+            downloadBtn.innerHTML =
+                `<svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Memproses…`;
             try {
-                // Capture dengan html2canvas 
                 const canvas = await html2canvas(previewCanvas, {
                     scale: 2.8,
-                    backgroundColor: '#000000',
+                    backgroundColor: '#1a1410',
                     useCORS: true,
                     logging: false,
-                    allowTaint: false
+                    allowTaint: false,
+                    width: previewCanvas.scrollWidth,
+                    height: previewCanvas.scrollHeight,
                 });
                 const link = document.createElement('a');
                 link.download = `quotestudio_${Date.now()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                showToast('✨ Gambar berhasil disimpan! Kualitas high-res', 'success');
-            } catch(err) {
+                showToast('✨ Gambar berhasil disimpan! Rasio asli terjaga.', 'success');
+            } catch (err) {
                 console.error(err);
                 showToast('❌ Gagal mengunduh, coba lagi', 'error');
             } finally {
@@ -513,14 +749,13 @@
             }
         });
 
-        // trigger initial text
+        // ─── INIT ───
         quoteDisplay.innerText = `"Hidup adalah petualangan yang berani."`;
         refreshTextLayout();
         quoteDisplay.style.fontFamily = fontSelect.value;
         authorDisplay.style.fontFamily = fontSelect.value;
-        // default active color preset
-        document.querySelector('.color-preset[data-color="#ffffff"]')?.classList.add('ring-2', 'ring-white');
+        document.querySelector('.color-preset[data-color="#f5ede6"]')?.classList.add('ring-2', 'ring-[#d4a06a]');
         showToast('Selamat datang! Unggah foto & buat desain keren', 'info');
     </script>
 </body>
-</html>
+    </html>
